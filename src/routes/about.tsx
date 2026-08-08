@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import founder from "@/assets/about-founder.jpg";
+import founder from "@/assets/about-founder.jpeg";
 import heroSkincare from "@/assets/hero-skincare.jpg";
 import oasisMassage from "@/assets/oasis-massage.jpg";
 import { Reveal } from "@/components/Reveal";
@@ -22,7 +22,10 @@ export const Route = createFileRoute("/about")({
 });
 
 const values = [
-  { title: "Beauty", copy: "Not a standard to meet — a version of yourself you recognise and like." },
+  {
+    title: "Beauty",
+    copy: "Not a standard to meet — a version of yourself you recognise and like.",
+  },
   { title: "Confidence", copy: "What good skin and real rest quietly give back to you." },
   { title: "Wellness", copy: "Care that reaches past the surface and into how your days feel." },
   { title: "Self-care", copy: "Unapologetic, scheduled, and never treated as an indulgence." },
@@ -38,7 +41,7 @@ function About() {
             It began with one question about skin
           </h1>
           <p className="mt-7 max-w-xl leading-relaxed text-muted-foreground">
-            Lilian started formulating for herself. Nothing on the shelf was honest about what it
+            Dr Lilian started formulating for herself. Nothing on the shelf was honest about what it
             could do, and almost nothing was made for the skin she actually had. What began in a
             small kitchen with a notebook became Signature by Lilian.
           </p>
@@ -50,7 +53,7 @@ function About() {
         <Reveal delay={100}>
           <img
             src={founder}
-            alt="Lilian, founder of Signature by Lilian"
+            alt="Dr Lilian, founder of Signature by Lilian"
             width={1008}
             height={1008}
             className="aspect-[4/5] w-full object-cover"
@@ -66,7 +69,7 @@ function About() {
               “Beauty should never feel like correction. It should feel like care that continues
               after you've left the room.”
             </p>
-            <p className="eyebrow mt-8 text-accent">Lilian, Founder</p>
+            <p className="eyebrow mt-8 text-accent">Dr Lilian, Founder</p>
           </Reveal>
         </div>
       </section>

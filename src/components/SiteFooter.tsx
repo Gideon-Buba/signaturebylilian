@@ -1,6 +1,7 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 
-import logo from "@/assets/logo-signature.png";
+import skincareLogo from "@/assets/skincare-logo.png";
+import oasisLogo from "@/assets/oasis-logo.png";
 
 const columns = [
   {
@@ -28,6 +29,10 @@ const columns = [
 const social = ["Instagram", "Facebook", "TikTok", "WhatsApp"];
 
 export function SiteFooter() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isOasis = pathname.startsWith("/oasis");
+  const logo = isOasis ? oasisLogo : skincareLogo;
+
   return (
     <footer className="border-t border-border bg-secondary/40">
       <div className="mx-auto max-w-[1440px] px-5 py-16 lg:px-10 lg:py-20">
@@ -35,10 +40,10 @@ export function SiteFooter() {
           <div className="max-w-sm">
             <img
               src={logo}
-              alt="Signature by Lilian"
+              alt={isOasis ? "Signature by Lilian Oasis" : "Signature by Lilian Skincare"}
               loading="lazy"
-              width={1024}
-              height={640}
+              width={1536}
+              height={1024}
               className="h-16 w-auto"
             />
             <p className="mt-5 text-sm leading-relaxed text-muted-foreground">

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Leaf, Sparkles, FlaskConical, Heart } from "lucide-react";
 
-import heroSkincare from "@/assets/hero-skincare.jpg";
+import heroSkincare from "@/assets/skincare-products-hero.jpeg";
 import { Reveal } from "@/components/Reveal";
 import { ProductCard } from "@/components/ProductCard";
 import { products } from "@/lib/catalog";
@@ -23,10 +23,26 @@ export const Route = createFileRoute("/skincare")({
 });
 
 const pillars = [
-  { icon: FlaskConical, title: "Proven actives", copy: "Formulas built on ingredients with real, published evidence — never trend-led." },
-  { icon: Leaf, title: "Kind to skin", copy: "pH-balanced, dermatologist-tested and free from needless irritants." },
-  { icon: Sparkles, title: "Visible results", copy: "Designed for glow you can see within a single cycle of use." },
-  { icon: Heart, title: "Made with care", copy: "Small batches, cruelty-free, and formulated by hand before it ever ships." },
+  {
+    icon: FlaskConical,
+    title: "Proven actives",
+    copy: "Formulas built on ingredients with real, published evidence — never trend-led.",
+  },
+  {
+    icon: Leaf,
+    title: "Kind to skin",
+    copy: "pH-balanced, dermatologist-tested and free from needless irritants.",
+  },
+  {
+    icon: Sparkles,
+    title: "Visible results",
+    copy: "Designed for glow you can see within a single cycle of use.",
+  },
+  {
+    icon: Heart,
+    title: "Made with care",
+    copy: "Small batches, cruelty-free, and formulated by hand before it ever ships.",
+  },
 ];
 
 const collections = [
@@ -36,15 +52,39 @@ const collections = [
 ];
 
 const reviews = [
-  { name: "Adaeze O.", text: "Six weeks with the Radiance Serum and my tone has completely evened out. It feels like a treat every morning.", product: "Radiance Renewal Serum" },
-  { name: "Bisi A.", text: "The cleanser is the only one my sensitive skin has never reacted to. I've repurchased four times.", product: "Gentle Cleanser" },
-  { name: "Kemi T.", text: "The packaging, the texture, the scent — it feels far more expensive than it is.", product: "Brightening Face Cream" },
+  {
+    name: "Adaeze O.",
+    text: "Six weeks with the Glow Serum and my tone has completely evened out. It feels like a treat every morning.",
+    product: "Glow Serum (50ml)",
+  },
+  {
+    name: "Bisi A.",
+    text: "The face soap is the only cleanse my sensitive skin has never reacted to. I've repurchased four times.",
+    product: "Face Soap (200g)",
+  },
+  {
+    name: "Kemi T.",
+    text: "The packaging, the texture, the scent — it feels far more expensive than it is.",
+    product: "Body Butter (300g)",
+  },
 ];
 
 const tips = [
-  { step: "01", title: "Cleanse gently", copy: "Lukewarm water, no scrubbing. Your barrier is worth protecting." },
-  { step: "02", title: "Treat with intent", copy: "Serums on damp skin, thinnest textures first, one new active at a time." },
-  { step: "03", title: "Seal it in", copy: "Moisturiser every night, SPF every morning — without exception." },
+  {
+    step: "01",
+    title: "Cleanse gently",
+    copy: "Lukewarm water, no scrubbing. Your barrier is worth protecting.",
+  },
+  {
+    step: "02",
+    title: "Treat with intent",
+    copy: "Serums on damp skin, thinnest textures first, one new active at a time.",
+  },
+  {
+    step: "03",
+    title: "Seal it in",
+    copy: "Moisturiser every night, SPF every morning — without exception.",
+  },
 ];
 
 function Skincare() {

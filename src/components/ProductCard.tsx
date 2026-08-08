@@ -36,11 +36,15 @@ export function ProductCard({ product }: { product: Product }) {
         <h3 className="mt-2 font-serif text-2xl text-foreground">{product.name}</h3>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{product.blurb}</p>
         <div className="mt-4 flex items-center justify-between gap-4 pt-1">
-          <span className="font-serif text-xl text-foreground">${product.price}</span>
+          <span className="font-serif text-xl text-foreground">
+            ₦{product.price.toLocaleString()}
+          </span>
           <button
             type="button"
             onClick={() =>
-              toast.success("Added to cart", { description: `${product.name} — $${product.price}` })
+              toast.success("Added to cart", {
+                description: `${product.name} — ₦${product.price.toLocaleString()}`,
+              })
             }
             className="eyebrow border border-plum/30 px-4 py-3 text-plum transition-colors hover:bg-plum hover:text-primary-foreground"
           >

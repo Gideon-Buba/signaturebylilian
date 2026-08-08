@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
-import heroSkincare from "@/assets/hero-skincare.jpg";
+import heroSkincare from "@/assets/skincare-products-hero.jpeg";
 import oasisFacial from "@/assets/oasis-facial.jpg";
 import oasisMassage from "@/assets/oasis-massage.jpg";
-import serum from "@/assets/product-serum.jpg";
-import cream from "@/assets/product-cream.jpg";
-import oil from "@/assets/product-oil.jpg";
+import glowSerum from "@/assets/product-glow-serum.jpeg";
+import bodyButter from "@/assets/product-body-butter.jpeg";
+import bodyOil from "@/assets/product-body-oil.jpeg";
 import { Reveal } from "@/components/Reveal";
 
 const title = "Journal — Beauty & Wellness Notes | Signature by Lilian";
@@ -51,7 +51,7 @@ const posts: {
       "It is in almost everything now. Here is what the research supports, and what percentage your skin actually needs.",
     read: "5 min",
     date: "April 2026",
-    image: serum,
+    image: glowSerum,
   },
   {
     title: "The evening wind-down we recommend to every client",
@@ -77,7 +77,7 @@ const posts: {
       "Oily skin can use oil. The trick is what you layer it over, and how much you actually need.",
     read: "5 min",
     date: "March 2026",
-    image: oil,
+    image: bodyOil,
   },
   {
     title: "Self-care is a schedule, not a mood",
@@ -86,7 +86,7 @@ const posts: {
       "Why the people who feel best are the ones who book it in advance and treat it like any other appointment.",
     read: "4 min",
     date: "February 2026",
-    image: cream,
+    image: bodyButter,
   },
 ];
 

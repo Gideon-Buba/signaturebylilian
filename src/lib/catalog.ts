@@ -1,7 +1,8 @@
-import serum from "@/assets/product-serum.jpg";
-import cream from "@/assets/product-cream.jpg";
-import cleanser from "@/assets/product-cleanser.jpg";
-import oil from "@/assets/product-oil.jpg";
+import bodyButter from "@/assets/product-body-butter.jpeg";
+import bodyOil from "@/assets/product-body-oil.jpeg";
+import bodyScrub from "@/assets/product-body-scrub.jpeg";
+import faceSoap from "@/assets/product-face-soap.jpeg";
+import glowSerum from "@/assets/product-glow-serum.jpeg";
 
 export type Product = {
   id: string;
@@ -17,48 +18,81 @@ export type Product = {
 
 export const products: Product[] = [
   {
-    id: "radiance-serum",
-    name: "Radiance Renewal Serum",
-    blurb: "A weightless brightening serum with peptides and vitamin C.",
-    price: 48,
+    id: "body-butter-300g",
+    name: "Body Butter (300g)",
+    blurb: "A rich, whipped body butter with mango, sweet almond and carrot seed oil.",
+    price: 19500,
     rating: 4.9,
-    reviews: 214,
+    reviews: 184,
     tag: "Best Seller",
-    image: serum,
-    benefits: ["Evens tone", "Boosts glow", "Softens fine lines"],
+    image: bodyButter,
+    benefits: ["Deep hydration", "Softens skin", "Rich, whipped texture"],
   },
   {
-    id: "brightening-cream",
-    name: "Brightening Face Cream",
-    blurb: "Rich yet breathable moisture with niacinamide and peony extract.",
-    price: 42,
-    rating: 4.8,
-    reviews: 168,
+    id: "body-butter-100g",
+    name: "Body Butter (100g)",
+    blurb: "Our whipped mango and sweet almond body butter in an everyday size.",
+    price: 12000,
+    rating: 4.9,
+    reviews: 112,
     tag: "Signature",
-    image: cream,
-    benefits: ["24h hydration", "Strengthens barrier", "Luminous finish"],
+    image: bodyButter,
+    benefits: ["Deep hydration", "Softens skin", "Rich, whipped texture"],
   },
   {
-    id: "gentle-cleanser",
-    name: "Gentle Cleanser",
-    blurb: "A pH-balanced cleanse that never strips or tightens the skin.",
-    price: 28,
-    rating: 4.7,
-    reviews: 302,
-    tag: "Best Seller",
-    image: cleanser,
-    benefits: ["Soothes", "Removes impurities", "Fragrance free"],
-  },
-  {
-    id: "nourish-oil",
-    name: "Nourish Facial Oil",
-    blurb: "A silken night oil of marula, rosehip and squalane.",
-    price: 54,
-    rating: 4.9,
-    reviews: 97,
+    id: "body-butter-50g",
+    name: "Body Butter (50g)",
+    blurb: "The whipped mango and sweet almond body butter, sized for travel.",
+    price: 6500,
+    rating: 4.8,
+    reviews: 63,
     tag: "New",
-    image: oil,
-    benefits: ["Deep nourishment", "Restores suppleness", "Overnight repair"],
+    image: bodyButter,
+    benefits: ["Deep hydration", "Softens skin", "Travel friendly"],
+  },
+  {
+    id: "body-oil-200ml",
+    name: "Body Oil (200ml)",
+    blurb: "A luminous body oil blended with argan, rosehip and carrot.",
+    price: 18500,
+    rating: 4.9,
+    reviews: 141,
+    tag: "Best Seller",
+    image: bodyOil,
+    benefits: ["Nourishes skin", "Adds radiant glow", "Fast-absorbing"],
+  },
+  {
+    id: "body-scrub-400g",
+    name: "Body Scrub (400g)",
+    blurb: "An exfoliating body scrub with citrus, turmeric and papaya.",
+    price: 15500,
+    rating: 4.7,
+    reviews: 98,
+    tag: "New",
+    image: bodyScrub,
+    benefits: ["Gently exfoliates", "Brightens skin", "Smooths texture"],
+  },
+  {
+    id: "face-soap-200g",
+    name: "Face Soap (200g)",
+    blurb: "A nourishing face soap with carrot, fenugreek and goat milk.",
+    price: 9500,
+    rating: 4.8,
+    reviews: 156,
+    tag: "Signature",
+    image: faceSoap,
+    benefits: ["Cleanses gently", "Evens tone", "Nourishing lather"],
+  },
+  {
+    id: "glow-serum-50ml",
+    name: "Glow Serum (50ml)",
+    blurb: "A brightening face serum with vitamin C and niacinamide.",
+    price: 7000,
+    rating: 4.9,
+    reviews: 227,
+    tag: "Best Seller",
+    image: glowSerum,
+    benefits: ["Brightens complexion", "Evens tone", "Boosts radiance"],
   },
 ];
 

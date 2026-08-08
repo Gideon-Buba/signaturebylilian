@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Clock, Instagram, Mail, MapPin, Phone } from "lucide-react";
 import { toast } from "sonner";
 
 import { Reveal } from "@/components/Reveal";
 
 const title = "Contact & Bookings — Signature by Lilian";
 const description =
-  "Reach Signature by Lilian by phone, email or WhatsApp, find our location and opening hours, or send us a message.";
+  "Reach Signature by Lilian by phone, email or Instagram, find our location and opening hours, or send us a message.";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -21,18 +21,18 @@ export const Route = createFileRoute("/contact")({
 });
 
 const details = [
-  { icon: Phone, label: "Phone", value: "+234 801 234 5678", href: "tel:+2348012345678" },
+  { icon: Phone, label: "Phone", value: "+234 703 205 0584", href: "tel:+2347032050584" },
   {
-    icon: MessageCircle,
-    label: "WhatsApp",
-    value: "Chat with us",
-    href: "https://wa.me/2348012345678",
+    icon: Instagram,
+    label: "Instagram",
+    value: "@sbl.skincare",
+    href: "https://www.instagram.com/sbl.skincare?igsh=MWExdjYyeHJ2dWpycg==",
   },
   {
     icon: Mail,
     label: "Email",
-    value: "hello@signaturebylilian.com",
-    href: "mailto:hello@signaturebylilian.com",
+    value: "DrLilian@signaturebylilian.com",
+    href: "mailto:DrLilian@signaturebylilian.com",
   },
   { icon: MapPin, label: "Visit", value: "24 Adeola Odeku Street, Victoria Island, Lagos" },
   { icon: Clock, label: "Hours", value: "Mon–Sat 9:00–20:00 · Sun by appointment" },
@@ -49,7 +49,7 @@ function Contact() {
               We'd love to hear from you
             </h1>
             <p className="mt-6 leading-relaxed text-muted-foreground">
-              For orders, product advice or an Oasis appointment — WhatsApp is the fastest way to
+              For orders, product advice or an Oasis appointment — Instagram is the fastest way to
               reach us.
             </p>
           </Reveal>
@@ -80,13 +80,17 @@ function Contact() {
           </ul>
 
           <div className="mt-8 flex flex-wrap gap-2">
-            {["Instagram", "Facebook", "TikTok"].map((s) => (
+            {[
+              { label: "Instagram", href: "https://www.instagram.com/sbl.skincare?igsh=MWExdjYyeHJ2dWpycg==" },
+              { label: "Facebook", href: "#" },
+              { label: "TikTok", href: "#" },
+            ].map((s) => (
               <a
-                key={s}
-                href="#"
+                key={s.label}
+                href={s.href}
                 className="eyebrow border border-border px-5 py-3 text-muted-foreground transition-colors hover:border-accent hover:text-accent"
               >
-                {s}
+                {s.label}
               </a>
             ))}
           </div>

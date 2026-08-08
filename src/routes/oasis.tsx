@@ -25,14 +25,29 @@ export const Route = createFileRoute("/oasis")({
 });
 
 const reasons = [
-  { title: "Private by design", copy: "Only three suites, so the space is never crowded and never rushed." },
-  { title: "Trained hands", copy: "Therapists with a minimum of eight years in clinical and spa practice." },
-  { title: "Considered products", copy: "Our own Signature formulations, used in every treatment." },
+  {
+    title: "Private by design",
+    copy: "Only three suites, so the space is never crowded and never rushed.",
+  },
+  {
+    title: "Trained hands",
+    copy: "Therapists with a minimum of eight years in clinical and spa practice.",
+  },
+  {
+    title: "Considered products",
+    copy: "Our own Signature formulations, used in every treatment.",
+  },
 ];
 
 const testimonials = [
-  { name: "Ifeoma N.", text: "I have never felt so looked after. I booked the Escape and walked out feeling like a different person." },
-  { name: "Zainab M.", text: "The room, the light, the quiet. It is the only place in the city I truly switch off." },
+  {
+    name: "Ifeoma N.",
+    text: "I have never felt so looked after. I booked the Escape and walked out feeling like a different person.",
+  },
+  {
+    name: "Zainab M.",
+    text: "The room, the light, the quiet. It is the only place in the city I truly switch off.",
+  },
 ];
 
 function Oasis() {
@@ -92,9 +107,7 @@ function Oasis() {
         <div className="mx-auto max-w-[1440px] px-5 py-20 lg:px-10 lg:py-28">
           <Reveal className="max-w-xl">
             <p className="eyebrow text-gold">Treatments & Services</p>
-            <h2 className="mt-4 font-serif text-4xl text-foreground lg:text-5xl">
-              Our spa menu
-            </h2>
+            <h2 className="mt-4 font-serif text-4xl text-foreground lg:text-5xl">Our spa menu</h2>
           </Reveal>
 
           <div className="mt-14 grid gap-px bg-border lg:grid-cols-2">
@@ -102,7 +115,7 @@ function Oasis() {
               <Reveal key={t.id} delay={i * 80} className="bg-background p-8 lg:p-12">
                 <div className="flex flex-wrap items-baseline justify-between gap-4">
                   <h3 className="font-serif text-3xl text-foreground">{t.name}</h3>
-                  <span className="font-serif text-2xl text-accent">${t.price}</span>
+                  <span className="font-serif text-2xl text-accent">₦{t.price}</span>
                 </div>
                 <p className="eyebrow mt-3 text-muted-foreground">{t.duration}</p>
                 <p className="mt-5 max-w-md leading-relaxed text-muted-foreground">
@@ -206,7 +219,7 @@ function BookingSection() {
           <dl className="mt-10 space-y-5 text-sm">
             <div>
               <dt className="eyebrow text-muted-foreground">Call or WhatsApp</dt>
-              <dd className="mt-2 font-serif text-xl text-foreground">+234 801 234 5678</dd>
+              <dd className="mt-2 font-serif text-xl text-foreground">+234 703 205 0584</dd>
             </div>
             <div>
               <dt className="eyebrow text-muted-foreground">Opening hours</dt>
@@ -241,7 +254,7 @@ function BookingSection() {
               >
                 {treatments.map((t) => (
                   <option key={t.id} value={t.id}>
-                    {t.name} — {t.duration} · ${t.price}
+                    {t.name} — {t.duration} · ₦{t.price}
                   </option>
                 ))}
               </select>

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import heroSkincare from "@/assets/hero-skincare.jpg";
+import heroSkincare from "@/assets/hero-skincare.png";
 import heroOasis from "@/assets/hero-oasis.jpg";
 import oasisMassage from "@/assets/oasis-massage.jpg";
 import { Reveal } from "@/components/Reveal";
@@ -193,7 +193,7 @@ function Home() {
                       {t.duration}
                     </p>
                   </div>
-                  <span className="font-serif text-lg text-accent">${t.price}</span>
+                  <span className="font-serif text-lg text-accent">₦{t.price}</span>
                 </li>
               ))}
             </ul>
