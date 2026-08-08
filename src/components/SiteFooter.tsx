@@ -1,0 +1,92 @@
+import { Link } from "@tanstack/react-router";
+
+import logo from "@/assets/logo-signature.png";
+
+const columns = [
+  {
+    title: "Signature by Lilian",
+    links: [
+      { label: "Skincare", to: "/skincare" as const },
+      { label: "Oasis", to: "/oasis" as const },
+      { label: "About", to: "/about" as const },
+      { label: "Journal", to: "/journal" as const },
+      { label: "Contact", to: "/contact" as const },
+    ],
+  },
+  {
+    title: "Customer",
+    links: [
+      { label: "Shop", to: "/skincare" as const },
+      { label: "Orders", to: "/contact" as const },
+      { label: "Shipping", to: "/contact" as const },
+      { label: "Returns", to: "/contact" as const },
+      { label: "FAQs", to: "/contact" as const },
+    ],
+  },
+];
+
+const social = ["Instagram", "Facebook", "TikTok", "WhatsApp"];
+
+export function SiteFooter() {
+  return (
+    <footer className="border-t border-border bg-secondary/40">
+      <div className="mx-auto max-w-[1440px] px-5 py-16 lg:px-10 lg:py-20">
+        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="max-w-sm">
+            <img
+              src={logo}
+              alt="Signature by Lilian"
+              loading="lazy"
+              width={1024}
+              height={640}
+              className="h-16 w-auto"
+            />
+            <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
+              Premium skincare and restorative wellness experiences, created to help you look, feel,
+              and live beautifully.
+            </p>
+          </div>
+
+          {columns.map((col) => (
+            <div key={col.title}>
+              <h3 className="eyebrow text-muted-foreground">{col.title}</h3>
+              <ul className="mt-5 space-y-3">
+                {col.links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      to={link.to}
+                      className="text-sm text-foreground transition-colors hover:text-accent"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+
+          <div>
+            <h3 className="eyebrow text-muted-foreground">Connect</h3>
+            <ul className="mt-5 space-y-3">
+              {social.map((item) => (
+                <li key={item}>
+                  <a
+                    href="#"
+                    className="text-sm text-foreground transition-colors hover:text-accent"
+                  >
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-14 flex flex-col gap-3 border-t border-border pt-7 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} Signature by Lilian. All rights reserved.</p>
+          <p className="tracking-[0.2em] uppercase">Skincare · Oasis</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
