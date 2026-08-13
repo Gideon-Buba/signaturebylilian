@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import heroSkincare from "@/assets/skincare-products-hero.jpeg";
 import oasisFacial from "@/assets/oasis-facial.jpg";
-import oasisMassage from "@/assets/oasis-massage.jpg";
+import oasisMassage from "@/assets/oasis-massage.png";
 import glowSerum from "@/assets/product-glow-serum.jpeg";
 import bodyButter from "@/assets/product-body-butter.jpeg";
 import bodyOil from "@/assets/product-body-oil.jpeg";

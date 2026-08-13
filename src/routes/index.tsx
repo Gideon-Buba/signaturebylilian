@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import heroSkincare from "@/assets/hero-skincare.png";
 import heroOasis from "@/assets/hero-oasis.jpg";
-import oasisMassage from "@/assets/oasis-massage.jpg";
+import oasisMassage from "@/assets/oasis-massage.png";
 import { Reveal } from "@/components/Reveal";
 import { ProductCard } from "@/components/ProductCard";
 import { products, treatments } from "@/lib/catalog";

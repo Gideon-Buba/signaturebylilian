@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 import heroOasis from "@/assets/hero-oasis.jpg";
 import oasisFacial from "@/assets/oasis-facial.jpg";
-import oasisMassage from "@/assets/oasis-massage.jpg";
+import oasisMassage from "@/assets/oasis-massage.png";
 import { Reveal } from "@/components/Reveal";
 import { treatments } from "@/lib/catalog";
 
