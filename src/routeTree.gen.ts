@@ -20,6 +20,9 @@ import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin/products/index'
 import { Route as AdminProductsProductIdRouteImport } from './routes/admin/products/$productId'
 import { Route as AdminProductsNewRouteImport } from './routes/admin/products/new'
+import { Route as AdminTreatmentsIndexRouteImport } from './routes/admin/treatments/index'
+import { Route as AdminTreatmentsTreatmentIdRouteImport } from './routes/admin/treatments/$treatmentId'
+import { Route as AdminTreatmentsNewRouteImport } from './routes/admin/treatments/new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,6 +79,22 @@ const AdminProductsNewRoute = AdminProductsNewRouteImport.update({
   path: '/admin/products/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminTreatmentsIndexRoute = AdminTreatmentsIndexRouteImport.update({
+  id: '/admin/treatments/',
+  path: '/admin/treatments/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminTreatmentsTreatmentIdRoute =
+  AdminTreatmentsTreatmentIdRouteImport.update({
+    id: '/admin/treatments/$treatmentId',
+    path: '/admin/treatments/$treatmentId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AdminTreatmentsNewRoute = AdminTreatmentsNewRouteImport.update({
+  id: '/admin/treatments/new',
+  path: '/admin/treatments/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -88,7 +107,10 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/admin/products/$productId': typeof AdminProductsProductIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/treatments/$treatmentId': typeof AdminTreatmentsTreatmentIdRoute
+  '/admin/treatments/new': typeof AdminTreatmentsNewRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/admin/treatments/': typeof AdminTreatmentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -101,7 +123,10 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/admin/products/$productId': typeof AdminProductsProductIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/treatments/$treatmentId': typeof AdminTreatmentsTreatmentIdRoute
+  '/admin/treatments/new': typeof AdminTreatmentsNewRoute
   '/admin/products': typeof AdminProductsIndexRoute
+  '/admin/treatments': typeof AdminTreatmentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,7 +140,10 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/admin/products/$productId': typeof AdminProductsProductIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/treatments/$treatmentId': typeof AdminTreatmentsTreatmentIdRoute
+  '/admin/treatments/new': typeof AdminTreatmentsNewRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/admin/treatments/': typeof AdminTreatmentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,7 +158,10 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/admin/products/$productId'
     | '/admin/products/new'
+    | '/admin/treatments/$treatmentId'
+    | '/admin/treatments/new'
     | '/admin/products/'
+    | '/admin/treatments/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -143,7 +174,10 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin/products/$productId'
     | '/admin/products/new'
+    | '/admin/treatments/$treatmentId'
+    | '/admin/treatments/new'
     | '/admin/products'
+    | '/admin/treatments'
   id:
     | '__root__'
     | '/'
@@ -156,7 +190,10 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/admin/products/$productId'
     | '/admin/products/new'
+    | '/admin/treatments/$treatmentId'
+    | '/admin/treatments/new'
     | '/admin/products/'
+    | '/admin/treatments/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -170,7 +207,10 @@ export interface RootRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   AdminProductsProductIdRoute: typeof AdminProductsProductIdRoute
   AdminProductsNewRoute: typeof AdminProductsNewRoute
+  AdminTreatmentsTreatmentIdRoute: typeof AdminTreatmentsTreatmentIdRoute
+  AdminTreatmentsNewRoute: typeof AdminTreatmentsNewRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
+  AdminTreatmentsIndexRoute: typeof AdminTreatmentsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -252,6 +292,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/treatments/': {
+      id: '/admin/treatments/'
+      path: '/admin/treatments'
+      fullPath: '/admin/treatments/'
+      preLoaderRoute: typeof AdminTreatmentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/treatments/$treatmentId': {
+      id: '/admin/treatments/$treatmentId'
+      path: '/admin/treatments/$treatmentId'
+      fullPath: '/admin/treatments/$treatmentId'
+      preLoaderRoute: typeof AdminTreatmentsTreatmentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/treatments/new': {
+      id: '/admin/treatments/new'
+      path: '/admin/treatments/new'
+      fullPath: '/admin/treatments/new'
+      preLoaderRoute: typeof AdminTreatmentsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -266,7 +327,10 @@ const rootRouteChildren: RootRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   AdminProductsProductIdRoute: AdminProductsProductIdRoute,
   AdminProductsNewRoute: AdminProductsNewRoute,
+  AdminTreatmentsTreatmentIdRoute: AdminTreatmentsTreatmentIdRoute,
+  AdminTreatmentsNewRoute: AdminTreatmentsNewRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
+  AdminTreatmentsIndexRoute: AdminTreatmentsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -17,6 +17,11 @@ const sections = [
     title: "Products",
     copy: "Add, edit and archive skincare products — pricing, sizes, descriptions and photos.",
   },
+  {
+    to: "/admin/treatments" as const,
+    title: "Spa Menu",
+    copy: "Manage Oasis treatments and services — grouped by category, with featured highlights.",
+  },
 ];
 
 function AdminDashboard() {

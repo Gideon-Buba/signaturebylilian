@@ -7,6 +7,7 @@ import { logoutFn } from "@/server-fns/auth";
 const adminNav = [
   { to: "/admin", label: "Dashboard" },
   { to: "/admin/products", label: "Products" },
+  { to: "/admin/treatments", label: "Spa Menu" },
 ] as const;
 
 export function AdminShell({

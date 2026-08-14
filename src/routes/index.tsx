@@ -6,7 +6,8 @@ import oasisMassage from "@/assets/oasis-massage.jpeg";
 import { Reveal } from "@/components/Reveal";
 import { SignatureUnderline } from "@/components/SignatureUnderline";
 import { ProductCard } from "@/components/ProductCard";
-import { products, treatments } from "@/lib/catalog";
+import { products } from "@/lib/catalog";
+import { listTreatmentsFn } from "@/server-fns/treatments";
 
 const title = "Signature by Lilian — Premium Skincare & Luxury Spa";
 const description =
@@ -21,10 +22,18 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: description },
     ],
   }),
+  loader: async () => {
+    const treatments = await listTreatmentsFn();
+    return { treatments };
+  },
   component: Home,
 });
 
 function Home() {
+  const { treatments } = Route.useLoaderData();
+  const featuredTreatments = treatments.filter((t) => t.isFeatured).slice(0, 3);
+  const oasisPreview = featuredTreatments.length > 0 ? featuredTreatments : treatments.slice(0, 3);
+
   return (
     <>
       {/* Hero */}
@@ -189,15 +198,19 @@ function Home() {
               built around one thing — how you feel when you leave.
             </p>
             <ul className="mt-10 divide-y divide-border border-y border-border">
-              {treatments.slice(0, 3).map((t) => (
+              {oasisPreview.map((t) => (
                 <li key={t.id} className="flex items-baseline justify-between gap-6 py-5">
                   <div>
                     <p className="font-serif text-xl text-foreground">{t.name}</p>
-                    <p className="mt-1 text-xs tracking-[0.18em] text-muted-foreground uppercase">
-                      {t.duration}
-                    </p>
+                    {t.duration && (
+                      <p className="mt-1 text-xs tracking-[0.18em] text-muted-foreground uppercase">
+                        {t.duration}
+                      </p>
+                    )}
                   </div>
-                  <span className="font-serif text-lg text-accent">₦{t.price}</span>
+                  <span className="font-serif text-lg text-accent">
+                    {t.price != null ? `₦${t.price.toLocaleString()}` : "Contact for pricing"}
+                  </span>
                 </li>
               ))}
             </ul>
