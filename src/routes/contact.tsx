@@ -35,7 +35,7 @@ const details = [
     href: "mailto:DrLilian@signaturebylilian.com",
   },
   { icon: MapPin, label: "Visit", value: "24 Adeola Odeku Street, Victoria Island, Lagos" },
-  { icon: Clock, label: "Hours", value: "Mon–Sat 9:00–20:00 · Sun by appointment" },
+  { icon: Clock, label: "Hours", value: "Mon–Sat 9:00–18:30 · Sun by appointment" },
 ];
 
 function Contact() {
@@ -81,7 +81,10 @@ function Contact() {
 
           <div className="mt-8 flex flex-wrap gap-2">
             {[
-              { label: "Instagram", href: "https://www.instagram.com/sbl.skincare?igsh=MWExdjYyeHJ2dWpycg==" },
+              {
+                label: "Instagram",
+                href: "https://www.instagram.com/sbl.skincare?igsh=MWExdjYyeHJ2dWpycg==",
+              },
               { label: "Facebook", href: "#" },
               { label: "TikTok", href: "#" },
             ].map((s) => (

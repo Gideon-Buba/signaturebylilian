@@ -6,7 +6,12 @@ import heroOasis from "@/assets/hero-oasis.jpeg";
 import oasisFacial from "@/assets/oasis-facial.jpeg";
 import oasisMassage from "@/assets/oasis-massage.jpeg";
 import { Reveal } from "@/components/Reveal";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { listTreatmentsFn, type Treatment } from "@/server-fns/treatments";
 
 const title = "Oasis — Luxury Spa & Wellness | Signature by Lilian";
@@ -168,9 +173,7 @@ function Oasis() {
                 <Reveal key={t.id} delay={i * 80} className="bg-background p-8 lg:p-12">
                   <div className="flex flex-wrap items-baseline justify-between gap-4">
                     <h3 className="font-serif text-3xl text-foreground">{t.name}</h3>
-                    <span className="font-serif text-2xl text-accent">
-                      {formatPrice(t.price)}
-                    </span>
+                    <span className="font-serif text-2xl text-accent">{formatPrice(t.price)}</span>
                   </div>
                   {t.duration && <p className="eyebrow mt-3 text-muted-foreground">{t.duration}</p>}
                   {t.description && (
@@ -230,9 +233,7 @@ function Oasis() {
                       <span className="text-foreground">
                         {t.name}
                         {t.duration && (
-                          <span className="ml-2 text-xs text-muted-foreground">
-                            ({t.duration})
-                          </span>
+                          <span className="ml-2 text-xs text-muted-foreground">({t.duration})</span>
                         )}
                       </span>
                       <span className="shrink-0 font-serif text-foreground">
@@ -328,7 +329,7 @@ function BookingSection({ treatments }: { treatments: Treatment[] }) {
             </div>
             <div>
               <dt className="eyebrow text-muted-foreground">Opening hours</dt>
-              <dd className="mt-2 text-foreground">Mon–Sat, 9:00 — 20:00 · Sun by appointment</dd>
+              <dd className="mt-2 text-foreground">Mon–Sat, 9:00 — 18:30 · Sun by appointment</dd>
             </div>
           </dl>
         </Reveal>

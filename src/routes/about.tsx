@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import founder from "@/assets/about-founder.jpeg";
-import heroSkincare from "@/assets/hero-skincare.jpg";
+import bodyButter from "@/assets/product-body-butter.jpeg";
 import oasisMassage from "@/assets/oasis-massage.jpeg";
 import { Reveal } from "@/components/Reveal";
 
@@ -85,7 +85,7 @@ function About() {
         <div className="mt-14 grid gap-12 lg:grid-cols-2 lg:gap-16">
           <Reveal>
             <img
-              src={heroSkincare}
+              src={bodyButter}
               alt="Signature by Lilian Skincare products"
               loading="lazy"
               width={1280}
