@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import founder from "@/assets/about-founder.jpeg";
 import heroSkincare from "@/assets/hero-skincare.jpg";
-import oasisMassage from "@/assets/oasis-massage.png";
+import oasisMassage from "@/assets/oasis-massage.jpeg";
 import { Reveal } from "@/components/Reveal";
 
 const title = "About — Signature by Lilian";

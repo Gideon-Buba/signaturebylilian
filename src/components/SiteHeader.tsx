@@ -33,9 +33,7 @@ export function SiteHeader() {
           <img
             src={logo}
             alt={isOasis ? "Signature by Lilian Oasis" : "Signature by Lilian Skincare"}
-            width={1536}
-            height={1024}
-            className="h-11 w-auto shrink-0 lg:h-14"
+            className="h-16 w-auto shrink-0 lg:h-20"
           />
         </Link>
 
