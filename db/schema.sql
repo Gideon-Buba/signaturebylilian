@@ -67,11 +67,13 @@ create policy "Admins can delete products" on products
 create table if not exists treatments (
   id uuid primary key default gen_random_uuid(),
   name text not null,
+  category text not null default '',
   description text not null default '',
-  duration text not null,
-  price integer not null check (price >= 0),
+  duration text,
+  price integer check (price >= 0), -- null price = "Contact for pricing"
   benefits text[] not null default '{}',
   image_url text,
+  is_featured boolean not null default false,
   is_active boolean not null default true,
   is_archived boolean not null default false,
   sort_order integer not null default 0,
