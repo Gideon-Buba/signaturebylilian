@@ -2,9 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import heroOasis from "@/assets/hero-oasis.jpg";
-import oasisFacial from "@/assets/oasis-facial.jpg";
-import oasisMassage from "@/assets/oasis-massage.png";
+import heroOasis from "@/assets/hero-oasis.jpeg";
+import oasisFacial from "@/assets/oasis-facial.jpeg";
+import oasisMassage from "@/assets/oasis-massage.jpeg";
 import { Reveal } from "@/components/Reveal";
 import { treatments } from "@/lib/catalog";
 

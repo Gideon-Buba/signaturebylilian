@@ -42,9 +42,7 @@ export function SiteFooter() {
               src={logo}
               alt={isOasis ? "Signature by Lilian Oasis" : "Signature by Lilian Skincare"}
               loading="lazy"
-              width={1536}
-              height={1024}
-              className="h-16 w-auto"
+              className="h-24 w-auto"
             />
             <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
               Premium skincare and restorative wellness experiences, created to help you look, feel,

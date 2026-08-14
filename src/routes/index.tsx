@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-
 import heroSkincare from "@/assets/hero-skincare.png";
-import heroOasis from "@/assets/hero-oasis.jpg";
-import oasisMassage from "@/assets/oasis-massage.png";
+import bodyButter from "@/assets/product-body-butter.jpeg";
+import heroOasis from "@/assets/hero-oasis.jpeg";
+import oasisMassage from "@/assets/oasis-massage.jpeg";
 import { Reveal } from "@/components/Reveal";
+import { SignatureUnderline } from "@/components/SignatureUnderline";
 import { ProductCard } from "@/components/ProductCard";
 import { products, treatments } from "@/lib/catalog";
 
@@ -33,15 +34,18 @@ function Home() {
             <Reveal>
               <p className="eyebrow text-accent">Signature by Lilian</p>
               <h1 className="mt-6 font-serif text-[2.75rem] leading-[1.05] text-foreground sm:text-6xl lg:text-7xl">
-                Your Signature.
-                <br />
                 Your Beauty.
                 <br />
-                <span className="text-plum italic">Your Wellbeing.</span>
+                Your Wellbeing.
+                <br />
+                <span className="relative inline-block text-plum italic font-bold">
+                  Your Signature.
+                  <SignatureUnderline className="absolute inset-x-0 -bottom-3 h-3 text-plum/80 sm:-bottom-4 sm:h-4" />
+                </span>
               </h1>
               <p className="mt-7 max-w-lg text-base leading-relaxed text-muted-foreground">
-                Discover the world of Signature by Lilian — premium skincare and restorative
-                wellness experiences designed to help you look, feel, and live beautifully.
+                Discover the world of Signature by Lilian, premium skincare and restorative wellness
+                experiences designed to help you look, feel, and live beautifully.
               </p>
               <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                 <Link
@@ -92,7 +96,7 @@ function Home() {
           <Reveal className="group">
             <div className="overflow-hidden bg-blush/50">
               <img
-                src={heroSkincare}
+                src={bodyButter}
                 alt="Signature by Lilian Skincare collection"
                 loading="lazy"
                 width={1280}
