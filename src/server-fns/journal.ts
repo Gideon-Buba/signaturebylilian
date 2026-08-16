@@ -90,6 +90,21 @@ export const getJournalPostFn = createServerFn({ method: "GET" })
     return fromRow(row as JournalPostRow);
   });
 
+export const getJournalPostByIdFn = createServerFn({ method: "GET" })
+  .validator(z.object({ id: z.string().uuid() }))
+  .handler(async ({ data }) => {
+    await requireAdmin();
+    const supabase = getSupabaseServerClient();
+    const { data: row, error } = await supabase
+      .from("journal_posts")
+      .select("*")
+      .eq("id", data.id)
+      .single();
+
+    if (error) throw new Error(error.message);
+    return fromRow(row as JournalPostRow);
+  });
+
 export const createJournalPostFn = createServerFn({ method: "POST" })
   .validator(journalInput)
   .handler(async ({ data }) => {

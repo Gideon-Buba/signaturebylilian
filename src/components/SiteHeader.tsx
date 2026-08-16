@@ -1,10 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Menu, ShoppingBag, X } from "lucide-react";
 import { useState } from "react";
 
 import skincareLogo from "@/assets/skincare-logo.png";
 import oasisLogo from "@/assets/oasis-logo.png";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/lib/cart";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -20,6 +21,7 @@ export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isOasis = pathname.startsWith("/oasis");
   const logo = isOasis ? oasisLogo : skincareLogo;
+  const { count } = useCart();
 
   return (
     <header
@@ -69,16 +71,38 @@ export function SiteHeader() {
           >
             Book Appointment
           </Link>
+          <Link
+            to="/cart"
+            aria-label="View cart"
+            className="relative p-2 text-foreground transition-colors hover:text-accent"
+          >
+            <ShoppingBag className="size-5" strokeWidth={1.5} />
+            {count > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-accent text-[10px] font-medium text-accent-foreground">
+                {count}
+              </span>
+            )}
+          </Link>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Close menu" : "Open menu"}
-          className="justify-self-end p-2 text-foreground lg:hidden"
-        >
-          {open ? <X className="size-5" /> : <Menu className="size-5" />}
-        </button>
+        <div className="flex items-center gap-1 justify-self-end lg:hidden">
+          <Link to="/cart" aria-label="View cart" className="relative p-2 text-foreground">
+            <ShoppingBag className="size-5" strokeWidth={1.5} />
+            {count > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-accent text-[10px] font-medium text-accent-foreground">
+                {count}
+              </span>
+            )}
+          </Link>
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            className="p-2 text-foreground"
+          >
+            {open ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
+        </div>
       </div>
 
       {open && (

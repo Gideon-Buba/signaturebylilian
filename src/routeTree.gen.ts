@@ -11,12 +11,20 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as CartRouteImport } from './routes/cart'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as JournalRouteImport } from './routes/journal'
 import { Route as OasisRouteImport } from './routes/oasis'
-import { Route as SkincareRouteImport } from './routes/skincare'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as JournalIndexRouteImport } from './routes/journal/index'
+import { Route as JournalSlugRouteImport } from './routes/journal/$slug'
+import { Route as SkincareIndexRouteImport } from './routes/skincare/index'
+import { Route as SkincareProductIdRouteImport } from './routes/skincare/$productId'
+import { Route as AdminJournalIndexRouteImport } from './routes/admin/journal/index'
+import { Route as AdminJournalPostIdRouteImport } from './routes/admin/journal/$postId'
+import { Route as AdminJournalNewRouteImport } from './routes/admin/journal/new'
+import { Route as AdminOrdersIndexRouteImport } from './routes/admin/orders/index'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin/products/index'
 import { Route as AdminProductsProductIdRouteImport } from './routes/admin/products/$productId'
 import { Route as AdminProductsNewRouteImport } from './routes/admin/products/new'
@@ -34,24 +42,24 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const JournalRoute = JournalRouteImport.update({
-  id: '/journal',
-  path: '/journal',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const OasisRoute = OasisRouteImport.update({
   id: '/oasis',
   path: '/oasis',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SkincareRoute = SkincareRouteImport.update({
-  id: '/skincare',
-  path: '/skincare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -62,6 +70,46 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalIndexRoute = JournalIndexRouteImport.update({
+  id: '/journal/',
+  path: '/journal/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalSlugRoute = JournalSlugRouteImport.update({
+  id: '/journal/$slug',
+  path: '/journal/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SkincareIndexRoute = SkincareIndexRouteImport.update({
+  id: '/skincare/',
+  path: '/skincare/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SkincareProductIdRoute = SkincareProductIdRouteImport.update({
+  id: '/skincare/$productId',
+  path: '/skincare/$productId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminJournalIndexRoute = AdminJournalIndexRouteImport.update({
+  id: '/admin/journal/',
+  path: '/admin/journal/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminJournalPostIdRoute = AdminJournalPostIdRouteImport.update({
+  id: '/admin/journal/$postId',
+  path: '/admin/journal/$postId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminJournalNewRoute = AdminJournalNewRouteImport.update({
+  id: '/admin/journal/new',
+  path: '/admin/journal/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminOrdersIndexRoute = AdminOrdersIndexRouteImport.update({
+  id: '/admin/orders/',
+  path: '/admin/orders/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
@@ -99,32 +147,48 @@ const AdminTreatmentsNewRoute = AdminTreatmentsNewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
-  '/journal': typeof JournalRoute
   '/oasis': typeof OasisRoute
-  '/skincare': typeof SkincareRoute
   '/admin/login': typeof AdminLoginRoute
+  '/journal/$slug': typeof JournalSlugRoute
+  '/skincare/$productId': typeof SkincareProductIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/journal/': typeof JournalIndexRoute
+  '/skincare/': typeof SkincareIndexRoute
+  '/admin/journal/$postId': typeof AdminJournalPostIdRoute
+  '/admin/journal/new': typeof AdminJournalNewRoute
   '/admin/products/$productId': typeof AdminProductsProductIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/treatments/$treatmentId': typeof AdminTreatmentsTreatmentIdRoute
   '/admin/treatments/new': typeof AdminTreatmentsNewRoute
+  '/admin/journal/': typeof AdminJournalIndexRoute
+  '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/treatments/': typeof AdminTreatmentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
-  '/journal': typeof JournalRoute
   '/oasis': typeof OasisRoute
-  '/skincare': typeof SkincareRoute
   '/admin/login': typeof AdminLoginRoute
+  '/journal/$slug': typeof JournalSlugRoute
+  '/skincare/$productId': typeof SkincareProductIdRoute
   '/admin': typeof AdminIndexRoute
+  '/journal': typeof JournalIndexRoute
+  '/skincare': typeof SkincareIndexRoute
+  '/admin/journal/$postId': typeof AdminJournalPostIdRoute
+  '/admin/journal/new': typeof AdminJournalNewRoute
   '/admin/products/$productId': typeof AdminProductsProductIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/treatments/$treatmentId': typeof AdminTreatmentsTreatmentIdRoute
   '/admin/treatments/new': typeof AdminTreatmentsNewRoute
+  '/admin/journal': typeof AdminJournalIndexRoute
+  '/admin/orders': typeof AdminOrdersIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
   '/admin/treatments': typeof AdminTreatmentsIndexRoute
 }
@@ -132,16 +196,24 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
-  '/journal': typeof JournalRoute
   '/oasis': typeof OasisRoute
-  '/skincare': typeof SkincareRoute
   '/admin/login': typeof AdminLoginRoute
+  '/journal/$slug': typeof JournalSlugRoute
+  '/skincare/$productId': typeof SkincareProductIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/journal/': typeof JournalIndexRoute
+  '/skincare/': typeof SkincareIndexRoute
+  '/admin/journal/$postId': typeof AdminJournalPostIdRoute
+  '/admin/journal/new': typeof AdminJournalNewRoute
   '/admin/products/$productId': typeof AdminProductsProductIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/treatments/$treatmentId': typeof AdminTreatmentsTreatmentIdRoute
   '/admin/treatments/new': typeof AdminTreatmentsNewRoute
+  '/admin/journal/': typeof AdminJournalIndexRoute
+  '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/treatments/': typeof AdminTreatmentsIndexRoute
 }
@@ -150,48 +222,72 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/cart'
+    | '/checkout'
     | '/contact'
-    | '/journal'
     | '/oasis'
-    | '/skincare'
     | '/admin/login'
+    | '/journal/$slug'
+    | '/skincare/$productId'
     | '/admin/'
+    | '/journal/'
+    | '/skincare/'
+    | '/admin/journal/$postId'
+    | '/admin/journal/new'
     | '/admin/products/$productId'
     | '/admin/products/new'
     | '/admin/treatments/$treatmentId'
     | '/admin/treatments/new'
+    | '/admin/journal/'
+    | '/admin/orders/'
     | '/admin/products/'
     | '/admin/treatments/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/cart'
+    | '/checkout'
     | '/contact'
-    | '/journal'
     | '/oasis'
-    | '/skincare'
     | '/admin/login'
+    | '/journal/$slug'
+    | '/skincare/$productId'
     | '/admin'
+    | '/journal'
+    | '/skincare'
+    | '/admin/journal/$postId'
+    | '/admin/journal/new'
     | '/admin/products/$productId'
     | '/admin/products/new'
     | '/admin/treatments/$treatmentId'
     | '/admin/treatments/new'
+    | '/admin/journal'
+    | '/admin/orders'
     | '/admin/products'
     | '/admin/treatments'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/cart'
+    | '/checkout'
     | '/contact'
-    | '/journal'
     | '/oasis'
-    | '/skincare'
     | '/admin/login'
+    | '/journal/$slug'
+    | '/skincare/$productId'
     | '/admin/'
+    | '/journal/'
+    | '/skincare/'
+    | '/admin/journal/$postId'
+    | '/admin/journal/new'
     | '/admin/products/$productId'
     | '/admin/products/new'
     | '/admin/treatments/$treatmentId'
     | '/admin/treatments/new'
+    | '/admin/journal/'
+    | '/admin/orders/'
     | '/admin/products/'
     | '/admin/treatments/'
   fileRoutesById: FileRoutesById
@@ -199,16 +295,24 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  CartRoute: typeof CartRoute
+  CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
-  JournalRoute: typeof JournalRoute
   OasisRoute: typeof OasisRoute
-  SkincareRoute: typeof SkincareRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  JournalSlugRoute: typeof JournalSlugRoute
+  SkincareProductIdRoute: typeof SkincareProductIdRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  JournalIndexRoute: typeof JournalIndexRoute
+  SkincareIndexRoute: typeof SkincareIndexRoute
+  AdminJournalPostIdRoute: typeof AdminJournalPostIdRoute
+  AdminJournalNewRoute: typeof AdminJournalNewRoute
   AdminProductsProductIdRoute: typeof AdminProductsProductIdRoute
   AdminProductsNewRoute: typeof AdminProductsNewRoute
   AdminTreatmentsTreatmentIdRoute: typeof AdminTreatmentsTreatmentIdRoute
   AdminTreatmentsNewRoute: typeof AdminTreatmentsNewRoute
+  AdminJournalIndexRoute: typeof AdminJournalIndexRoute
+  AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
   AdminTreatmentsIndexRoute: typeof AdminTreatmentsIndexRoute
 }
@@ -229,6 +333,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -236,25 +354,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/journal': {
-      id: '/journal'
-      path: '/journal'
-      fullPath: '/journal'
-      preLoaderRoute: typeof JournalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/oasis': {
       id: '/oasis'
       path: '/oasis'
       fullPath: '/oasis'
       preLoaderRoute: typeof OasisRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/skincare': {
-      id: '/skincare'
-      path: '/skincare'
-      fullPath: '/skincare'
-      preLoaderRoute: typeof SkincareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -269,6 +373,62 @@ declare module '@tanstack/react-router' {
       path: '/admin/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal/': {
+      id: '/journal/'
+      path: '/journal'
+      fullPath: '/journal/'
+      preLoaderRoute: typeof JournalIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal/$slug': {
+      id: '/journal/$slug'
+      path: '/journal/$slug'
+      fullPath: '/journal/$slug'
+      preLoaderRoute: typeof JournalSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/skincare/': {
+      id: '/skincare/'
+      path: '/skincare'
+      fullPath: '/skincare/'
+      preLoaderRoute: typeof SkincareIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/skincare/$productId': {
+      id: '/skincare/$productId'
+      path: '/skincare/$productId'
+      fullPath: '/skincare/$productId'
+      preLoaderRoute: typeof SkincareProductIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/journal/': {
+      id: '/admin/journal/'
+      path: '/admin/journal'
+      fullPath: '/admin/journal/'
+      preLoaderRoute: typeof AdminJournalIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/journal/$postId': {
+      id: '/admin/journal/$postId'
+      path: '/admin/journal/$postId'
+      fullPath: '/admin/journal/$postId'
+      preLoaderRoute: typeof AdminJournalPostIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/journal/new': {
+      id: '/admin/journal/new'
+      path: '/admin/journal/new'
+      fullPath: '/admin/journal/new'
+      preLoaderRoute: typeof AdminJournalNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/orders/': {
+      id: '/admin/orders/'
+      path: '/admin/orders'
+      fullPath: '/admin/orders/'
+      preLoaderRoute: typeof AdminOrdersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/products/': {
@@ -319,16 +479,24 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  CartRoute: CartRoute,
+  CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
-  JournalRoute: JournalRoute,
   OasisRoute: OasisRoute,
-  SkincareRoute: SkincareRoute,
   AdminLoginRoute: AdminLoginRoute,
+  JournalSlugRoute: JournalSlugRoute,
+  SkincareProductIdRoute: SkincareProductIdRoute,
   AdminIndexRoute: AdminIndexRoute,
+  JournalIndexRoute: JournalIndexRoute,
+  SkincareIndexRoute: SkincareIndexRoute,
+  AdminJournalPostIdRoute: AdminJournalPostIdRoute,
+  AdminJournalNewRoute: AdminJournalNewRoute,
   AdminProductsProductIdRoute: AdminProductsProductIdRoute,
   AdminProductsNewRoute: AdminProductsNewRoute,
   AdminTreatmentsTreatmentIdRoute: AdminTreatmentsTreatmentIdRoute,
   AdminTreatmentsNewRoute: AdminTreatmentsNewRoute,
+  AdminJournalIndexRoute: AdminJournalIndexRoute,
+  AdminOrdersIndexRoute: AdminOrdersIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
   AdminTreatmentsIndexRoute: AdminTreatmentsIndexRoute,
 }

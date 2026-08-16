@@ -26,12 +26,17 @@ const columns = [
   },
 ];
 
-const social = ["Instagram", "Facebook", "TikTok", "WhatsApp"];
+const SKINCARE_INSTAGRAM = "https://www.instagram.com/sbl.skincare?igsh=MWExdjYyeHJ2dWpycg==";
+const OASIS_INSTAGRAM = "https://www.instagram.com/sbl_oasis?igsh=MTNvMjNpd2F0ZGhlNg==";
 
 export function SiteFooter() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isOasis = pathname.startsWith("/oasis");
   const logo = isOasis ? oasisLogo : skincareLogo;
+  const social = [
+    { label: "Instagram", href: isOasis ? OASIS_INSTAGRAM : SKINCARE_INSTAGRAM },
+    { label: "WhatsApp", href: "#" },
+  ];
 
   return (
     <footer className="border-t border-border bg-secondary/40">
@@ -72,12 +77,12 @@ export function SiteFooter() {
             <h3 className="eyebrow text-muted-foreground">Connect</h3>
             <ul className="mt-5 space-y-3">
               {social.map((item) => (
-                <li key={item}>
+                <li key={item.label}>
                   <a
-                    href="#"
+                    href={item.href}
                     className="text-sm text-foreground transition-colors hover:text-accent"
                   >
-                    {item}
+                    {item.label}
                   </a>
                 </li>
               ))}

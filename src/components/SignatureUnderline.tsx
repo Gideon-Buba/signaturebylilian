@@ -33,7 +33,11 @@ export function SignatureUnderline({ className }: { className?: string }) {
 
   return (
     <div ref={wrapperRef} aria-hidden="true" className={cn("pointer-events-none", className)}>
-      <svg viewBox="0 0 340 32" preserveAspectRatio="none" className="h-full w-full overflow-visible">
+      <svg
+        viewBox="0 0 340 32"
+        preserveAspectRatio="none"
+        className="h-full w-full overflow-visible"
+      >
         <path
           d="M4 14 C 34 30, 66 2, 100 13 S 170 27, 205 12 S 275 3, 305 15 S 330 22, 336 13"
           fill="none"

@@ -24,9 +24,15 @@ const details = [
   { icon: Phone, label: "Phone", value: "+234 703 205 0584", href: "tel:+2347032050584" },
   {
     icon: Instagram,
-    label: "Instagram",
+    label: "Instagram — Skincare",
     value: "@sbl.skincare",
     href: "https://www.instagram.com/sbl.skincare?igsh=MWExdjYyeHJ2dWpycg==",
+  },
+  {
+    icon: Instagram,
+    label: "Instagram — Oasis",
+    value: "@sbl_oasis",
+    href: "https://www.instagram.com/sbl_oasis?igsh=MTNvMjNpd2F0ZGhlNg==",
   },
   {
     icon: Mail,
@@ -34,7 +40,12 @@ const details = [
     value: "DrLilian@signaturebylilian.com",
     href: "mailto:DrLilian@signaturebylilian.com",
   },
-  { icon: MapPin, label: "Visit", value: "24 Adeola Odeku Street, Victoria Island, Lagos" },
+  {
+    icon: MapPin,
+    label: "Visit",
+    value: "No 2 Omako Street, Off No 3 Stephen Ocheni Street, Wuye, Abuja",
+    href: "https://maps.app.goo.gl/fRzY7R86oMdSDaHZA",
+  },
   { icon: Clock, label: "Hours", value: "Mon–Sat 9:00–18:30 · Sun by appointment" },
 ];
 
@@ -82,11 +93,13 @@ function Contact() {
           <div className="mt-8 flex flex-wrap gap-2">
             {[
               {
-                label: "Instagram",
+                label: "Instagram (Skincare)",
                 href: "https://www.instagram.com/sbl.skincare?igsh=MWExdjYyeHJ2dWpycg==",
               },
-              { label: "Facebook", href: "#" },
-              { label: "TikTok", href: "#" },
+              {
+                label: "Instagram (Oasis)",
+                href: "https://www.instagram.com/sbl_oasis?igsh=MTNvMjNpd2F0ZGhlNg==",
+              },
             ].map((s) => (
               <a
                 key={s.label}
@@ -136,7 +149,7 @@ function Contact() {
       <section className="border-t border-border">
         <iframe
           title="Signature by Lilian location map"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=3.406%2C6.420%2C3.446%2C6.446&layer=mapnik"
+          src="https://www.google.com/maps?q=Plot+780+Cadastral+Zone+B10,+Wuye,+Abuja,+Federal+Capital+Territory&output=embed"
           loading="lazy"
           className="h-[420px] w-full border-0 grayscale-[35%]"
         />
