@@ -1,18 +1,53 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import {
+  Sparkles,
+  HeartHandshake,
+  Flower2,
+  Footprints,
+  Hand,
+  Dumbbell,
+  Droplet,
+  Zap,
+  Feather,
+  Syringe,
+  Smile,
+  Lock,
+  Eye,
+  Star,
+  Stethoscope,
+  MessageCircle,
+  GraduationCap,
+  Gem,
+  type LucideIcon,
+} from "lucide-react";
 
 import heroOasis from "@/assets/hero-oasis.jpeg";
 import oasisFacial from "@/assets/oasis-facial.jpeg";
 import oasisMassage from "@/assets/oasis-massage.jpeg";
 import { Reveal } from "@/components/Reveal";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { listTreatmentsFn, type Treatment } from "@/server-fns/treatments";
+
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  "Facial Treatments": Sparkles,
+  Massages: HeartHandshake,
+  "Body Treatment": Flower2,
+  Pedicure: Footprints,
+  Manicure: Hand,
+  "Body Sculpting": Dumbbell,
+  "IV Therapy": Droplet,
+  "Laser Treatment": Zap,
+  Waxing: Feather,
+  "PRP Treatments": Syringe,
+  "Dental Care": Smile,
+  "Private Care": Lock,
+  Eyebrows: Eye,
+  "Eyelash Extensions": Star,
+  "Skin Consultation": Stethoscope,
+  Counselling: MessageCircle,
+  "Trainings & Workshops": GraduationCap,
+};
 
 const title = "Oasis — Luxury Spa & Wellness | Signature by Lilian";
 const description =
@@ -106,6 +141,8 @@ function Oasis() {
   const { treatments } = Route.useLoaderData();
   const featured = treatments.filter((t) => t.isFeatured);
   const grouped = useMemo(() => groupByCategory(treatments), [treatments]);
+  const [activeCategory, setActiveCategory] = useState(grouped[0]?.[0] ?? "");
+  const activeItems = grouped.find(([category]) => category === activeCategory)?.[1] ?? [];
 
   return (
     <div className="theme-oasis bg-background">
@@ -212,41 +249,66 @@ function Oasis() {
           <p className="eyebrow text-gold">Full Price List</p>
           <h2 className="mt-4 font-serif text-4xl text-foreground lg:text-5xl">Our spa menu</h2>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            Browse by category — tap to expand.
+            Choose a category to see treatments and pricing.
           </p>
         </Reveal>
 
-        <Accordion type="multiple" className="mt-12 max-w-3xl">
-          {grouped.map(([category, items]) => (
-            <AccordionItem key={category} value={category}>
-              <AccordionTrigger className="font-serif text-xl text-foreground hover:no-underline">
-                <span>
-                  {category}{" "}
-                  <span className="ml-2 text-sm font-normal text-muted-foreground">
-                    ({items.length})
+        <div className="mt-12 min-w-0 lg:grid lg:grid-cols-[240px_1fr] lg:items-start lg:gap-12">
+          <nav aria-label="Treatment categories">
+            <Reveal className="scrollbar-none -mx-5 flex gap-2 overflow-x-auto px-5 pb-4 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0">
+              {grouped.map(([category, items]) => {
+                const Icon = CATEGORY_ICONS[category] ?? Gem;
+                const active = category === activeCategory;
+                return (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => setActiveCategory(category)}
+                    data-active={active}
+                    className="eyebrow group flex shrink-0 items-center gap-2.5 border-b-2 border-transparent px-1 py-3 text-left text-muted-foreground transition-colors hover:text-foreground data-[active=true]:border-gold data-[active=true]:text-foreground lg:w-full lg:border-b-0 lg:border-l-2 lg:px-4"
+                  >
+                    <Icon className="size-4 shrink-0 text-gold/80" strokeWidth={1.5} />
+                    <span className="whitespace-nowrap lg:whitespace-normal">{category}</span>
+                    <span className="ml-auto text-[10px] text-muted-foreground/60">
+                      {items.length}
+                    </span>
+                  </button>
+                );
+              })}
+            </Reveal>
+          </nav>
+
+          <Reveal delay={100} className="mt-10 min-w-0 border border-border/70 p-8 lg:mt-0 lg:p-12">
+            <div className="flex items-baseline justify-between gap-4 border-b border-border pb-5">
+              <h3 className="font-serif text-2xl text-foreground lg:text-3xl">
+                {activeCategory}
+              </h3>
+              <span className="eyebrow shrink-0 text-muted-foreground">
+                {activeItems.length} treatment{activeItems.length === 1 ? "" : "s"}
+              </span>
+            </div>
+            <div className="grid gap-x-12 sm:grid-cols-2">
+              {activeItems.map((t) => (
+                <div
+                  key={t.id}
+                  className="flex flex-wrap items-baseline gap-x-2 border-b border-border/40 py-4"
+                >
+                  <span className="min-w-0 text-foreground">{t.name}</span>
+                  {t.duration && (
+                    <span className="shrink-0 text-xs text-muted-foreground">({t.duration})</span>
+                  )}
+                  <span
+                    aria-hidden="true"
+                    className="mx-1 h-px min-w-4 flex-1 translate-y-[-4px] border-b border-dotted border-border"
+                  />
+                  <span className="shrink-0 font-serif text-lg text-accent">
+                    {formatPrice(t.price)}
                   </span>
-                </span>
-              </AccordionTrigger>
-              <AccordionContent>
-                <ul className="divide-y divide-border/60">
-                  {items.map((t) => (
-                    <li key={t.id} className="flex items-baseline justify-between gap-6 py-3">
-                      <span className="text-foreground">
-                        {t.name}
-                        {t.duration && (
-                          <span className="ml-2 text-xs text-muted-foreground">({t.duration})</span>
-                        )}
-                      </span>
-                      <span className="shrink-0 font-serif text-foreground">
-                        {formatPrice(t.price)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
       </section>
 
       <section className="mx-auto max-w-[1440px] px-5 py-20 lg:px-10 lg:py-24">
@@ -335,7 +397,7 @@ function BookingSection({ treatments }: { treatments: Treatment[] }) {
           </dl>
         </Reveal>
 
-        <Reveal delay={100}>
+        <Reveal delay={100} className="min-w-0">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -345,19 +407,19 @@ function BookingSection({ treatments }: { treatments: Treatment[] }) {
               (e.target as HTMLFormElement).reset();
               setTreatment(treatments[0]?.id ?? "");
             }}
-            className="grid gap-5 border border-border bg-background p-7 lg:p-10"
+            className="grid min-w-0 gap-5 border border-border bg-background p-7 lg:p-10"
           >
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Full name" name="name" />
               <Field label="Phone" name="phone" type="tel" />
             </div>
             <Field label="Email" name="email" type="email" />
-            <label className="grid gap-2">
+            <label className="grid min-w-0 gap-2">
               <span className="eyebrow text-muted-foreground">Treatment</span>
               <select
                 value={treatment}
                 onChange={(e) => setTreatment(e.target.value)}
-                className="border border-input bg-background px-4 py-3.5 text-sm text-foreground outline-none focus:border-accent"
+                className="w-full min-w-0 border border-input bg-background px-4 py-3.5 text-sm text-foreground outline-none focus:border-accent"
               >
                 {grouped.map(([category, items]) => (
                   <optgroup key={category} label={category}>
