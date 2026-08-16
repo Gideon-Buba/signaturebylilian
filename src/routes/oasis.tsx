@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -27,6 +28,7 @@ import heroOasis from "@/assets/hero-oasis.jpeg";
 import oasisFacial from "@/assets/oasis-facial.jpeg";
 import oasisMassage from "@/assets/oasis-massage.jpeg";
 import { Reveal } from "@/components/Reveal";
+import { createBookingFn } from "@/server-fns/bookings";
 import { listTreatmentsFn, type Treatment } from "@/server-fns/treatments";
 
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
@@ -373,6 +375,20 @@ function BookingSection({ treatments }: { treatments: Treatment[] }) {
   const grouped = useMemo(() => groupByCategory(treatments), [treatments]);
   const [treatment, setTreatment] = useState(treatments[0]?.id ?? "");
 
+  const bookingMutation = useMutation({
+    mutationFn: createBookingFn,
+    onSuccess: () => {
+      toast.success("Booking request received", {
+        description: "We'll confirm your appointment by phone shortly.",
+      });
+    },
+    onError: () => {
+      toast.error("Couldn't send your request", {
+        description: "Please try again, or call us directly.",
+      });
+    },
+  });
+
   return (
     <section id="booking" className="border-t border-border bg-cream">
       <div className="mx-auto grid max-w-[1440px] gap-14 px-5 py-20 lg:grid-cols-[1fr_1.1fr] lg:gap-20 lg:px-10 lg:py-28">
@@ -401,11 +417,30 @@ function BookingSection({ treatments }: { treatments: Treatment[] }) {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              toast.success("Booking request received", {
-                description: "We'll confirm your appointment by phone shortly.",
-              });
-              (e.target as HTMLFormElement).reset();
-              setTreatment(treatments[0]?.id ?? "");
+              const form = e.target as HTMLFormElement;
+              const formData = new FormData(form);
+              const selected = treatments.find((t) => t.id === treatment);
+
+              bookingMutation.mutate(
+                {
+                  data: {
+                    customerName: String(formData.get("name") ?? ""),
+                    phone: String(formData.get("phone") ?? ""),
+                    email: String(formData.get("email") ?? ""),
+                    treatmentId: selected?.id,
+                    treatmentName: selected?.name ?? "Not specified",
+                    preferredDate: String(formData.get("date") ?? ""),
+                    preferredTime: String(formData.get("time") ?? ""),
+                    notes: String(formData.get("notes") ?? ""),
+                  },
+                },
+                {
+                  onSuccess: () => {
+                    form.reset();
+                    setTreatment(treatments[0]?.id ?? "");
+                  },
+                },
+              );
             }}
             className="grid min-w-0 gap-5 border border-border bg-background p-7 lg:p-10"
           >
@@ -447,9 +482,10 @@ function BookingSection({ treatments }: { treatments: Treatment[] }) {
             </label>
             <button
               type="submit"
-              className="eyebrow mt-2 bg-foreground px-8 py-4 text-background transition-opacity hover:opacity-85"
+              disabled={bookingMutation.isPending}
+              className="eyebrow mt-2 bg-foreground px-8 py-4 text-background transition-opacity hover:opacity-85 disabled:opacity-60"
             >
-              Request Appointment
+              {bookingMutation.isPending ? "Sending…" : "Request Appointment"}
             </button>
           </form>
         </Reveal>

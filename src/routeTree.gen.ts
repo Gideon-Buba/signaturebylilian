@@ -21,6 +21,7 @@ import { Route as JournalIndexRouteImport } from './routes/journal/index'
 import { Route as JournalSlugRouteImport } from './routes/journal/$slug'
 import { Route as SkincareIndexRouteImport } from './routes/skincare/index'
 import { Route as SkincareProductIdRouteImport } from './routes/skincare/$productId'
+import { Route as AdminBookingsIndexRouteImport } from './routes/admin/bookings/index'
 import { Route as AdminJournalIndexRouteImport } from './routes/admin/journal/index'
 import { Route as AdminJournalPostIdRouteImport } from './routes/admin/journal/$postId'
 import { Route as AdminJournalNewRouteImport } from './routes/admin/journal/new'
@@ -90,6 +91,11 @@ const SkincareIndexRoute = SkincareIndexRouteImport.update({
 const SkincareProductIdRoute = SkincareProductIdRouteImport.update({
   id: '/skincare/$productId',
   path: '/skincare/$productId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminBookingsIndexRoute = AdminBookingsIndexRouteImport.update({
+  id: '/admin/bookings/',
+  path: '/admin/bookings/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminJournalIndexRoute = AdminJournalIndexRouteImport.update({
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/treatments/$treatmentId': typeof AdminTreatmentsTreatmentIdRoute
   '/admin/treatments/new': typeof AdminTreatmentsNewRoute
+  '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/journal/': typeof AdminJournalIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/treatments/$treatmentId': typeof AdminTreatmentsTreatmentIdRoute
   '/admin/treatments/new': typeof AdminTreatmentsNewRoute
+  '/admin/bookings': typeof AdminBookingsIndexRoute
   '/admin/journal': typeof AdminJournalIndexRoute
   '/admin/orders': typeof AdminOrdersIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/treatments/$treatmentId': typeof AdminTreatmentsTreatmentIdRoute
   '/admin/treatments/new': typeof AdminTreatmentsNewRoute
+  '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/journal/': typeof AdminJournalIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/admin/products/new'
     | '/admin/treatments/$treatmentId'
     | '/admin/treatments/new'
+    | '/admin/bookings/'
     | '/admin/journal/'
     | '/admin/orders/'
     | '/admin/products/'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/admin/products/new'
     | '/admin/treatments/$treatmentId'
     | '/admin/treatments/new'
+    | '/admin/bookings'
     | '/admin/journal'
     | '/admin/orders'
     | '/admin/products'
@@ -286,6 +297,7 @@ export interface FileRouteTypes {
     | '/admin/products/new'
     | '/admin/treatments/$treatmentId'
     | '/admin/treatments/new'
+    | '/admin/bookings/'
     | '/admin/journal/'
     | '/admin/orders/'
     | '/admin/products/'
@@ -311,6 +323,7 @@ export interface RootRouteChildren {
   AdminProductsNewRoute: typeof AdminProductsNewRoute
   AdminTreatmentsTreatmentIdRoute: typeof AdminTreatmentsTreatmentIdRoute
   AdminTreatmentsNewRoute: typeof AdminTreatmentsNewRoute
+  AdminBookingsIndexRoute: typeof AdminBookingsIndexRoute
   AdminJournalIndexRoute: typeof AdminJournalIndexRoute
   AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
@@ -401,6 +414,13 @@ declare module '@tanstack/react-router' {
       path: '/skincare/$productId'
       fullPath: '/skincare/$productId'
       preLoaderRoute: typeof SkincareProductIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/bookings/': {
+      id: '/admin/bookings/'
+      path: '/admin/bookings'
+      fullPath: '/admin/bookings/'
+      preLoaderRoute: typeof AdminBookingsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/journal/': {
@@ -495,6 +515,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminProductsNewRoute: AdminProductsNewRoute,
   AdminTreatmentsTreatmentIdRoute: AdminTreatmentsTreatmentIdRoute,
   AdminTreatmentsNewRoute: AdminTreatmentsNewRoute,
+  AdminBookingsIndexRoute: AdminBookingsIndexRoute,
   AdminJournalIndexRoute: AdminJournalIndexRoute,
   AdminOrdersIndexRoute: AdminOrdersIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
