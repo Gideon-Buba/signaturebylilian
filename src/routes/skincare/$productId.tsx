@@ -37,7 +37,6 @@ function ProductDetail() {
   ];
   const [activeIndex, setActiveIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const activeImage = images[activeIndex] ?? null;
 
   useEffect(() => {
     if (images.length < 2 || !playing) return;
@@ -60,17 +59,18 @@ function ProductDetail() {
 
       <div className="mt-8 grid gap-12 lg:grid-cols-2 lg:gap-16">
         <Reveal>
-          <div className="relative overflow-hidden bg-blush/60">
-            {activeImage && (
+          <div className="relative aspect-[4/5] w-full overflow-hidden bg-blush/60">
+            {images.map((url, i) => (
               <img
-                key={activeImage}
-                src={activeImage}
+                key={url + i}
+                src={url}
                 alt={product.name}
                 width={1000}
                 height={1200}
-                className="aspect-[4/5] w-full object-cover transition-opacity duration-500"
+                className="absolute inset-0 size-full object-cover transition-opacity duration-1000 ease-in-out"
+                style={{ opacity: i === activeIndex ? 1 : 0 }}
               />
-            )}
+            ))}
             {images.length > 1 && (
               <button
                 type="button"

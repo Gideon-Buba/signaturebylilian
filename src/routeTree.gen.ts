@@ -15,6 +15,7 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as OasisRouteImport } from './routes/oasis'
+import { Route as ZzFadeTestRouteImport } from './routes/zz-fade-test'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as JournalIndexRouteImport } from './routes/journal/index'
@@ -60,6 +61,11 @@ const ContactRoute = ContactRouteImport.update({
 const OasisRoute = OasisRouteImport.update({
   id: '/oasis',
   path: '/oasis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ZzFadeTestRoute = ZzFadeTestRouteImport.update({
+  id: '/zz-fade-test',
+  path: '/zz-fade-test',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/oasis': typeof OasisRoute
+  '/zz-fade-test': typeof ZzFadeTestRoute
   '/admin/login': typeof AdminLoginRoute
   '/journal/$slug': typeof JournalSlugRoute
   '/skincare/$productId': typeof SkincareProductIdRoute
@@ -175,6 +182,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/oasis': typeof OasisRoute
+  '/zz-fade-test': typeof ZzFadeTestRoute
   '/admin/login': typeof AdminLoginRoute
   '/journal/$slug': typeof JournalSlugRoute
   '/skincare/$productId': typeof SkincareProductIdRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/oasis': typeof OasisRoute
+  '/zz-fade-test': typeof ZzFadeTestRoute
   '/admin/login': typeof AdminLoginRoute
   '/journal/$slug': typeof JournalSlugRoute
   '/skincare/$productId': typeof SkincareProductIdRoute
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/oasis'
+    | '/zz-fade-test'
     | '/admin/login'
     | '/journal/$slug'
     | '/skincare/$productId'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/oasis'
+    | '/zz-fade-test'
     | '/admin/login'
     | '/journal/$slug'
     | '/skincare/$productId'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/oasis'
+    | '/zz-fade-test'
     | '/admin/login'
     | '/journal/$slug'
     | '/skincare/$productId'
@@ -299,6 +311,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   OasisRoute: typeof OasisRoute
+  ZzFadeTestRoute: typeof ZzFadeTestRoute
   AdminLoginRoute: typeof AdminLoginRoute
   JournalSlugRoute: typeof JournalSlugRoute
   SkincareProductIdRoute: typeof SkincareProductIdRoute
@@ -359,6 +372,13 @@ declare module '@tanstack/react-router' {
       path: '/oasis'
       fullPath: '/oasis'
       preLoaderRoute: typeof OasisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/zz-fade-test': {
+      id: '/zz-fade-test'
+      path: '/zz-fade-test'
+      fullPath: '/zz-fade-test'
+      preLoaderRoute: typeof ZzFadeTestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -483,6 +503,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   OasisRoute: OasisRoute,
+  ZzFadeTestRoute: ZzFadeTestRoute,
   AdminLoginRoute: AdminLoginRoute,
   JournalSlugRoute: JournalSlugRoute,
   SkincareProductIdRoute: SkincareProductIdRoute,
