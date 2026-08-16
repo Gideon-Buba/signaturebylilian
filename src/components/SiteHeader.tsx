@@ -61,13 +61,13 @@ export function SiteHeader() {
         <div className="hidden items-center justify-end gap-3 lg:flex">
           <Link
             to="/skincare"
-            className="eyebrow bg-plum px-5 py-3 text-primary-foreground transition-colors hover:bg-magenta"
+            className="eyebrow bg-plum px-5 py-3 whitespace-nowrap text-primary-foreground transition-colors hover:bg-magenta"
           >
             Shop Skincare
           </Link>
           <Link
             to="/oasis"
-            className="eyebrow border border-gold/70 px-5 py-3 text-foreground transition-colors hover:bg-champagne/40"
+            className="eyebrow border border-gold/70 px-5 py-3 whitespace-nowrap text-foreground transition-colors hover:bg-champagne/40"
           >
             Book Appointment
           </Link>

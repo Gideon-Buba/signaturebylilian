@@ -204,6 +204,15 @@
   }
 }
 
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @utility prose-journal {
   line-height: 1.75;
   color: var(--color-foreground);
