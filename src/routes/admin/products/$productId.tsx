@@ -36,6 +36,7 @@ function EditProduct() {
           benefits: product.benefits.join("\n"),
           inStock: product.inStock,
           imageUrl: product.imageUrl,
+          galleryUrls: product.galleryUrls,
         }}
         onSubmit={async (values) => {
           try {

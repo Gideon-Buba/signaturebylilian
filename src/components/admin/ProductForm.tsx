@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { X } from "lucide-react";
 import { toast } from "sonner";
 
 import { uploadImageFn } from "@/server-fns/uploads";
@@ -12,6 +13,7 @@ export type ProductFormValues = {
   benefits: string;
   inStock: boolean;
   imageUrl: string | null;
+  galleryUrls: string[];
 };
 
 const TAGS: ProductFormValues["tag"][] = ["New", "Best Seller", "Signature"];
@@ -31,6 +33,7 @@ export function ProductForm({
     benefits: string[];
     inStock: boolean;
     imageUrl?: string;
+    galleryUrls: string[];
   }) => Promise<void>;
   submitLabel: string;
 }) {
@@ -43,8 +46,10 @@ export function ProductForm({
     benefits: initial?.benefits ?? "",
     inStock: initial?.inStock ?? true,
     imageUrl: initial?.imageUrl ?? null,
+    galleryUrls: initial?.galleryUrls ?? [],
   });
   const [uploading, setUploading] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -65,6 +70,34 @@ export function ProductForm({
       setUploading(false);
       e.target.value = "";
     }
+  }
+
+  async function handleGalleryFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+
+    setGalleryUploading(true);
+    try {
+      const uploaded: string[] = [];
+      for (const file of files) {
+        const formData = new FormData();
+        formData.set("file", file);
+        formData.set("folder", "products");
+        const result = await uploadImageFn({ data: formData });
+        uploaded.push(result.url);
+      }
+      setValues((v) => ({ ...v, galleryUrls: [...v.galleryUrls, ...uploaded] }));
+      toast.success(uploaded.length === 1 ? "Photo uploaded" : `${uploaded.length} photos uploaded`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setGalleryUploading(false);
+      e.target.value = "";
+    }
+  }
+
+  function removeGalleryImage(url: string) {
+    setValues((v) => ({ ...v, galleryUrls: v.galleryUrls.filter((u) => u !== url) }));
   }
 
   return (
@@ -96,6 +129,7 @@ export function ProductForm({
               .map((b) => b.trim())
               .filter(Boolean),
             inStock: values.inStock,
+            galleryUrls: values.galleryUrls,
             ...(trimmedSize && { size: trimmedSize }),
             ...(values.imageUrl && { imageUrl: values.imageUrl }),
           });
@@ -128,6 +162,43 @@ export function ProductForm({
         </div>
         {uploading && <span className="text-xs text-muted-foreground">Uploading…</span>}
       </label>
+
+      <div className="grid gap-2">
+        <span className="eyebrow text-muted-foreground">
+          Additional photos (shown on the product page)
+        </span>
+        <div className="flex flex-wrap gap-3">
+          {values.galleryUrls.map((url) => (
+            <div key={url} className="group relative size-20">
+              <img
+                src={url}
+                alt="Additional product photo"
+                className="size-20 rounded object-cover"
+              />
+              <button
+                type="button"
+                aria-label="Remove photo"
+                onClick={() => removeGalleryImage(url)}
+                className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-foreground text-background opacity-0 transition-opacity group-hover:opacity-100"
+              >
+                <X className="size-3" strokeWidth={2} />
+              </button>
+            </div>
+          ))}
+          <label className="flex size-20 cursor-pointer flex-col items-center justify-center gap-1 rounded border border-dashed border-input text-center text-[10px] text-muted-foreground hover:border-accent hover:text-accent">
+            + Add
+            <input
+              type="file"
+              multiple
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleGalleryFilesChange}
+              disabled={galleryUploading}
+              className="hidden"
+            />
+          </label>
+        </div>
+        {galleryUploading && <span className="text-xs text-muted-foreground">Uploading…</span>}
+      </div>
 
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="grid gap-2">
@@ -214,7 +285,7 @@ export function ProductForm({
 
       <button
         type="submit"
-        disabled={submitting || uploading}
+        disabled={submitting || uploading || galleryUploading}
         className="eyebrow mt-2 w-fit bg-plum px-8 py-4 text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
       >
         {submitting ? "Saving…" : submitLabel}

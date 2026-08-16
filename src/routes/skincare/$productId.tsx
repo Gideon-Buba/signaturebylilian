@@ -1,7 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Pause, Play, Plus } from "lucide-react";
+
+const AUTOPLAY_INTERVAL_MS = 3500;
 
 import { Reveal } from "@/components/Reveal";
 import { useCart } from "@/lib/cart";
@@ -29,6 +31,22 @@ function ProductDetail() {
   const { product } = Route.useLoaderData();
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const images = [
+    ...(product.imageUrl ? [product.imageUrl] : []),
+    ...product.galleryUrls,
+  ];
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  const activeImage = images[activeIndex] ?? null;
+
+  useEffect(() => {
+    if (images.length < 2 || !playing) return;
+    const id = setInterval(() => {
+      setActiveIndex((i) => (i + 1) % images.length);
+    }, AUTOPLAY_INTERVAL_MS);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [images.length, playing]);
 
   return (
     <section className="mx-auto max-w-[1440px] px-5 py-14 lg:px-10 lg:py-20">
@@ -42,17 +60,51 @@ function ProductDetail() {
 
       <div className="mt-8 grid gap-12 lg:grid-cols-2 lg:gap-16">
         <Reveal>
-          <div className="overflow-hidden bg-blush/60">
-            {product.imageUrl && (
+          <div className="relative overflow-hidden bg-blush/60">
+            {activeImage && (
               <img
-                src={product.imageUrl}
+                key={activeImage}
+                src={activeImage}
                 alt={product.name}
                 width={1000}
                 height={1200}
-                className="aspect-[4/5] w-full object-cover"
+                className="aspect-[4/5] w-full object-cover transition-opacity duration-500"
               />
             )}
+            {images.length > 1 && (
+              <button
+                type="button"
+                aria-label={playing ? "Pause slideshow" : "Play slideshow"}
+                onClick={() => setPlaying((p) => !p)}
+                className="absolute right-4 bottom-4 flex size-10 items-center justify-center rounded-full bg-background/90 text-foreground transition-opacity hover:opacity-90"
+              >
+                {playing ? (
+                  <Pause className="size-4" strokeWidth={1.75} />
+                ) : (
+                  <Play className="size-4" strokeWidth={1.75} />
+                )}
+              </button>
+            )}
           </div>
+          {images.length > 1 && (
+            <div className="mt-4 flex flex-wrap gap-3">
+              {images.map((url, i) => (
+                <button
+                  key={url + i}
+                  type="button"
+                  aria-label={`View photo ${i + 1}`}
+                  onClick={() => {
+                    setActiveIndex(i);
+                    setPlaying(false);
+                  }}
+                  data-active={i === activeIndex}
+                  className="size-16 shrink-0 overflow-hidden border border-transparent opacity-70 transition-opacity hover:opacity-100 data-[active=true]:border-plum data-[active=true]:opacity-100"
+                >
+                  <img src={url} alt="" className="size-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </Reveal>
 
         <Reveal delay={100}>

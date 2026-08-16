@@ -12,6 +12,7 @@ export type Product = {
   price: number;
   tag: "Best Seller" | "New" | "Signature";
   imageUrl: string | null;
+  galleryUrls: string[];
   benefits: string[];
   inStock: boolean;
   isArchived: boolean;
@@ -26,6 +27,7 @@ type ProductRow = {
   price: number;
   tag: string;
   image_url: string | null;
+  gallery_urls: string[];
   benefits: string[];
   in_stock: boolean;
   is_archived: boolean;
@@ -41,6 +43,7 @@ function fromRow(row: ProductRow): Product {
     price: row.price,
     tag: row.tag as Product["tag"],
     imageUrl: row.image_url,
+    galleryUrls: row.gallery_urls ?? [],
     benefits: row.benefits,
     inStock: row.in_stock,
     isArchived: row.is_archived,
@@ -55,6 +58,7 @@ const productInput = z.object({
   price: z.number().int().nonnegative(),
   tag: z.enum(["Best Seller", "New", "Signature"]).default("New"),
   imageUrl: z.string().url().optional(),
+  galleryUrls: z.array(z.string().url()).default([]),
   benefits: z.array(z.string()).default([]),
   inStock: z.boolean().default(true),
   sortOrder: z.number().int().default(0),
@@ -100,6 +104,7 @@ export const createProductFn = createServerFn({ method: "POST" })
         price: data.price,
         tag: data.tag,
         image_url: data.imageUrl ?? null,
+        gallery_urls: data.galleryUrls,
         benefits: data.benefits,
         in_stock: data.inStock,
         sort_order: data.sortOrder,
@@ -116,7 +121,7 @@ export const updateProductFn = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireAdmin();
     const supabase = getSupabaseServerClient();
-    const { name, size, description, price, tag, imageUrl, benefits, inStock, sortOrder } =
+    const { name, size, description, price, tag, imageUrl, galleryUrls, benefits, inStock, sortOrder } =
       data.patch;
 
     const update: Record<string, unknown> = {};
@@ -126,6 +131,7 @@ export const updateProductFn = createServerFn({ method: "POST" })
     if (price !== undefined) update["price"] = price;
     if (tag !== undefined) update["tag"] = tag;
     if (imageUrl !== undefined) update["image_url"] = imageUrl;
+    if (galleryUrls !== undefined) update["gallery_urls"] = galleryUrls;
     if (benefits !== undefined) update["benefits"] = benefits;
     if (inStock !== undefined) update["in_stock"] = inStock;
     if (sortOrder !== undefined) update["sort_order"] = sortOrder;
