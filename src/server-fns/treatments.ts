@@ -185,3 +185,22 @@ export const restoreTreatmentFn = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { success: true as const };
   });
+
+// Persists a new display order — orderedIds is the full list of ids in the
+// admin's current view (in their new order), which become sort_order 0..n.
+export const reorderTreatmentsFn = createServerFn({ method: "POST" })
+  .validator(z.object({ orderedIds: z.array(z.string().uuid()) }))
+  .handler(async ({ data }) => {
+    await requireAdmin();
+    const supabase = getSupabaseServerClient();
+
+    const results = await Promise.all(
+      data.orderedIds.map((id, index) =>
+        supabase.from("treatments").update({ sort_order: index }).eq("id", id),
+      ),
+    );
+    const failed = results.find((r) => r.error);
+    if (failed?.error) throw new Error(failed.error.message);
+
+    return { success: true as const };
+  });

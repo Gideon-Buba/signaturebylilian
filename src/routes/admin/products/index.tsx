@@ -2,12 +2,34 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  rectSortingStrategy,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { GripVertical } from "lucide-react";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { BulkActionsBar } from "@/components/admin/BulkActionsBar";
+import { SortableItem } from "@/components/admin/SortableItem";
 import { ViewToggle, type ViewMode } from "@/components/admin/ViewToggle";
 import { requireAdminForRoute } from "@/lib/auth/routeGuard";
-import { deleteProductFn, listProductsFn, restoreProductFn } from "@/server-fns/products";
+import { useSortableList } from "@/lib/useSortableList";
+import {
+  deleteProductFn,
+  listProductsFn,
+  reorderProductsFn,
+  restoreProductFn,
+} from "@/server-fns/products";
 
 export const Route = createFileRoute("/admin/products/")({
   head: () => ({
@@ -74,8 +96,23 @@ function ProductsList() {
     onError: (err: Error) => toast.error(err.message),
   });
 
+  const reorderMutation = useMutation({
+    mutationFn: (orderedIds: string[]) => reorderProductsFn({ data: { orderedIds } }),
+    onSuccess: () => invalidate(),
+    onError: (err: Error) => toast.error(err.message),
+  });
+
   const filtered = (products ?? []).filter((p) =>
     tab === "active" ? !p.isArchived : p.isArchived,
+  );
+
+  const { ordered, handleDragEnd } = useSortableList(filtered, (orderedIds) =>
+    reorderMutation.mutate(orderedIds),
+  );
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
   function toggleTab(t: "active" | "archived") {
@@ -133,6 +170,13 @@ function ProductsList() {
         </div>
       </div>
 
+      {filtered.length > 1 && (
+        <p className="mt-4 text-xs text-muted-foreground">
+          Drag <GripVertical className="mb-0.5 inline size-3" strokeWidth={1.75} /> to reorder how
+          products appear on the site.
+        </p>
+      )}
+
       <BulkActionsBar count={selected.size} onClear={() => setSelected(new Set())}>
         {tab === "active" ? (
           <button
@@ -163,162 +207,205 @@ function ProductsList() {
         </p>
       )}
 
-      {!isLoading && filtered.length > 0 && view === "list" && (
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[760px] border-collapse text-left text-sm">
-            <thead>
-              <tr className="border-b border-border text-xs tracking-[0.12em] text-muted-foreground uppercase">
-                <th className="w-10 py-3 pr-4 font-normal">
-                  <input
-                    type="checkbox"
-                    aria-label="Select all"
-                    checked={selected.size === filtered.length}
-                    onChange={toggleAll}
-                    className="size-4"
-                  />
-                </th>
-                <th className="py-3 pr-4 font-normal">Image</th>
-                <th className="py-3 pr-4 font-normal">Name</th>
-                <th className="py-3 pr-4 font-normal">Price</th>
-                <th className="py-3 pr-4 font-normal">Tag</th>
-                <th className="py-3 pr-4 font-normal">Stock</th>
-                <th className="py-3 pr-4 font-normal text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((p) => (
-                <tr key={p.id} className="border-b border-border/60">
-                  <td className="py-3 pr-4">
-                    <input
-                      type="checkbox"
-                      aria-label={`Select ${p.name}`}
-                      checked={selected.has(p.id)}
-                      onChange={() => toggleOne(p.id)}
-                      className="size-4"
-                    />
-                  </td>
-                  <td className="py-3 pr-4">
-                    {p.imageUrl ? (
-                      <img
-                        src={p.imageUrl}
-                        alt={p.name}
-                        className="size-12 rounded object-cover"
+      {!isLoading && filtered.length > 0 && (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          {view === "list" && (
+            <div className="mt-6 overflow-x-auto">
+              <table className="w-full min-w-[800px] border-collapse text-left text-sm">
+                <thead>
+                  <tr className="border-b border-border text-xs tracking-[0.12em] text-muted-foreground uppercase">
+                    <th className="w-8 py-3 font-normal" />
+                    <th className="w-10 py-3 pr-4 font-normal">
+                      <input
+                        type="checkbox"
+                        aria-label="Select all"
+                        checked={selected.size === filtered.length}
+                        onChange={toggleAll}
+                        className="size-4"
                       />
-                    ) : (
-                      <div className="size-12 rounded bg-secondary" />
-                    )}
-                  </td>
-                  <td className="py-3 pr-4 text-foreground">
-                    {p.name}
-                    {p.size && <span className="text-muted-foreground"> ({p.size})</span>}
-                  </td>
-                  <td className="py-3 pr-4 text-foreground">₦{p.price.toLocaleString()}</td>
-                  <td className="py-3 pr-4 text-muted-foreground">{p.tag}</td>
-                  <td className="py-3 pr-4 text-muted-foreground">
-                    {p.inStock ? "In stock" : "Out of stock"}
-                  </td>
-                  <td className="py-3 pr-4 text-right">
-                    <div className="flex justify-end gap-3">
-                      <Link
-                        to="/admin/products/$productId"
-                        params={{ productId: p.id }}
-                        className="text-accent hover:underline"
-                      >
-                        Edit
-                      </Link>
-                      {tab === "active" ? (
-                        <button
-                          type="button"
-                          onClick={() => archiveMutation.mutate(p.id)}
-                          disabled={archiveMutation.isPending}
-                          className="text-muted-foreground hover:text-destructive"
-                        >
-                          Archive
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => restoreMutation.mutate(p.id)}
-                          disabled={restoreMutation.isPending}
-                          className="text-muted-foreground hover:text-accent"
-                        >
-                          Restore
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {!isLoading && filtered.length > 0 && view === "grid" && (
-        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((p) => (
-            <div
-              key={p.id}
-              className="relative border border-border p-4 transition-colors hover:border-accent/60"
-            >
-              <input
-                type="checkbox"
-                aria-label={`Select ${p.name}`}
-                checked={selected.has(p.id)}
-                onChange={() => toggleOne(p.id)}
-                className="absolute top-3 left-3 z-10 size-4"
-              />
-              <div className="aspect-square overflow-hidden rounded bg-secondary">
-                {p.imageUrl ? (
-                  <img src={p.imageUrl} alt={p.name} className="size-full object-cover" />
-                ) : (
-                  <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
-                    No image
-                  </div>
-                )}
-              </div>
-              <p className="mt-3 text-foreground">
-                {p.name}
-                {p.size && <span className="text-muted-foreground"> ({p.size})</span>}
-              </p>
-              <div className="mt-1 flex items-center justify-between text-sm">
-                <span className="text-foreground">₦{p.price.toLocaleString()}</span>
-                <span className="text-xs text-muted-foreground">{p.tag}</span>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {p.inStock ? "In stock" : "Out of stock"}
-              </p>
-              <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-                <Link
-                  to="/admin/products/$productId"
-                  params={{ productId: p.id }}
-                  className="text-sm text-accent hover:underline"
-                >
-                  Edit
-                </Link>
-                {tab === "active" ? (
-                  <button
-                    type="button"
-                    onClick={() => archiveMutation.mutate(p.id)}
-                    disabled={archiveMutation.isPending}
-                    className="text-sm text-muted-foreground hover:text-destructive"
+                    </th>
+                    <th className="py-3 pr-4 font-normal">Image</th>
+                    <th className="py-3 pr-4 font-normal">Name</th>
+                    <th className="py-3 pr-4 font-normal">Price</th>
+                    <th className="py-3 pr-4 font-normal">Tag</th>
+                    <th className="py-3 pr-4 font-normal">Stock</th>
+                    <th className="py-3 pr-4 font-normal text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <SortableContext
+                    items={ordered.map((p) => p.id)}
+                    strategy={verticalListSortingStrategy}
                   >
-                    Archive
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => restoreMutation.mutate(p.id)}
-                    disabled={restoreMutation.isPending}
-                    className="text-sm text-muted-foreground hover:text-accent"
-                  >
-                    Restore
-                  </button>
-                )}
-              </div>
+                    {ordered.map((p) => (
+                      <SortableItem key={p.id} id={p.id} as="tr" className="border-b border-border/60 bg-background">
+                        {({ attributes, listeners }) => (
+                          <>
+                            <td className="py-3 pl-4">
+                              <button
+                                type="button"
+                                aria-label={`Drag to reorder ${p.name}`}
+                                {...attributes}
+                                {...listeners}
+                                className="cursor-grab touch-none text-muted-foreground hover:text-foreground active:cursor-grabbing"
+                              >
+                                <GripVertical className="size-4" strokeWidth={1.75} />
+                              </button>
+                            </td>
+                            <td className="py-3 pr-4">
+                              <input
+                                type="checkbox"
+                                aria-label={`Select ${p.name}`}
+                                checked={selected.has(p.id)}
+                                onChange={() => toggleOne(p.id)}
+                                className="size-4"
+                              />
+                            </td>
+                            <td className="py-3 pr-4">
+                              {p.imageUrl ? (
+                                <img
+                                  src={p.imageUrl}
+                                  alt={p.name}
+                                  className="size-12 rounded object-cover"
+                                />
+                              ) : (
+                                <div className="size-12 rounded bg-secondary" />
+                              )}
+                            </td>
+                            <td className="py-3 pr-4 text-foreground">
+                              {p.name}
+                              {p.size && <span className="text-muted-foreground"> ({p.size})</span>}
+                            </td>
+                            <td className="py-3 pr-4 text-foreground">
+                              ₦{p.price.toLocaleString()}
+                            </td>
+                            <td className="py-3 pr-4 text-muted-foreground">{p.tag}</td>
+                            <td className="py-3 pr-4 text-muted-foreground">
+                              {p.inStock ? "In stock" : "Out of stock"}
+                            </td>
+                            <td className="py-3 pr-4 text-right">
+                              <div className="flex justify-end gap-3">
+                                <Link
+                                  to="/admin/products/$productId"
+                                  params={{ productId: p.id }}
+                                  className="text-accent hover:underline"
+                                >
+                                  Edit
+                                </Link>
+                                {tab === "active" ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => archiveMutation.mutate(p.id)}
+                                    disabled={archiveMutation.isPending}
+                                    className="text-muted-foreground hover:text-destructive"
+                                  >
+                                    Archive
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => restoreMutation.mutate(p.id)}
+                                    disabled={restoreMutation.isPending}
+                                    className="text-muted-foreground hover:text-accent"
+                                  >
+                                    Restore
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </>
+                        )}
+                      </SortableItem>
+                    ))}
+                  </SortableContext>
+                </tbody>
+              </table>
             </div>
-          ))}
-        </div>
+          )}
+
+          {view === "grid" && (
+            <SortableContext items={ordered.map((p) => p.id)} strategy={rectSortingStrategy}>
+              <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {ordered.map((p) => (
+                  <SortableItem
+                    key={p.id}
+                    id={p.id}
+                    className="relative border border-border bg-background p-4 transition-colors hover:border-accent/60"
+                  >
+                    {({ attributes, listeners }) => (
+                      <>
+                        <input
+                          type="checkbox"
+                          aria-label={`Select ${p.name}`}
+                          checked={selected.has(p.id)}
+                          onChange={() => toggleOne(p.id)}
+                          className="absolute top-3 left-3 z-10 size-4"
+                        />
+                        <button
+                          type="button"
+                          aria-label={`Drag to reorder ${p.name}`}
+                          {...attributes}
+                          {...listeners}
+                          className="absolute top-3 right-3 z-10 cursor-grab touch-none rounded bg-background/90 p-1 text-muted-foreground hover:text-foreground active:cursor-grabbing"
+                        >
+                          <GripVertical className="size-4" strokeWidth={1.75} />
+                        </button>
+                        <div className="aspect-square overflow-hidden rounded bg-secondary">
+                          {p.imageUrl ? (
+                            <img src={p.imageUrl} alt={p.name} className="size-full object-cover" />
+                          ) : (
+                            <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
+                              No image
+                            </div>
+                          )}
+                        </div>
+                        <p className="mt-3 text-foreground">
+                          {p.name}
+                          {p.size && <span className="text-muted-foreground"> ({p.size})</span>}
+                        </p>
+                        <div className="mt-1 flex items-center justify-between text-sm">
+                          <span className="text-foreground">₦{p.price.toLocaleString()}</span>
+                          <span className="text-xs text-muted-foreground">{p.tag}</span>
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {p.inStock ? "In stock" : "Out of stock"}
+                        </p>
+                        <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+                          <Link
+                            to="/admin/products/$productId"
+                            params={{ productId: p.id }}
+                            className="text-sm text-accent hover:underline"
+                          >
+                            Edit
+                          </Link>
+                          {tab === "active" ? (
+                            <button
+                              type="button"
+                              onClick={() => archiveMutation.mutate(p.id)}
+                              disabled={archiveMutation.isPending}
+                              className="text-sm text-muted-foreground hover:text-destructive"
+                            >
+                              Archive
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => restoreMutation.mutate(p.id)}
+                              disabled={restoreMutation.isPending}
+                              className="text-sm text-muted-foreground hover:text-accent"
+                            >
+                              Restore
+                            </button>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </SortableItem>
+                ))}
+              </div>
+            </SortableContext>
+          )}
+        </DndContext>
       )}
     </AdminShell>
   );
