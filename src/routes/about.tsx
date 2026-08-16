@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import founder from "@/assets/about-founder.jpeg";
-import bodyButter from "@/assets/product-body-butter.jpeg";
+import bodyButter from "@/assets/products/body-butter.jpeg";
 import oasisMassage from "@/assets/oasis-massage.jpeg";
 import { Reveal } from "@/components/Reveal";
 

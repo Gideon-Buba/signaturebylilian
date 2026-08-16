@@ -22,6 +22,16 @@ const sections = [
     title: "Spa Menu",
     copy: "Manage Oasis treatments and services — grouped by category, with featured highlights.",
   },
+  {
+    to: "/admin/journal" as const,
+    title: "Journal",
+    copy: "Write and publish skincare and wellness articles with the rich text editor.",
+  },
+  {
+    to: "/admin/orders" as const,
+    title: "Orders",
+    copy: "Review incoming skincare orders, customer details, and update order status.",
+  },
 ];
 
 function AdminDashboard() {

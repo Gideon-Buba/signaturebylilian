@@ -1,13 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import heroSkincare from "@/assets/hero-skincare.png";
-import bodyButter from "@/assets/product-body-butter.jpeg";
+import bodyButter from "@/assets/products/body-butter.jpeg";
 import heroOasis from "@/assets/hero-oasis.jpeg";
 import oasisMassage from "@/assets/oasis-massage.jpeg";
-import fingerprintSvg from "@/assets/fingerprint.svg?raw";
 import { Reveal } from "@/components/Reveal";
-import { SignatureUnderline } from "@/components/SignatureUnderline";
+// import { SignatureUnderline } from "@/components/SignatureUnderline";
 import { ProductCard } from "@/components/ProductCard";
-import { products } from "@/lib/catalog";
+import { toStoreProduct } from "@/lib/product-display";
+import { listProductsFn } from "@/server-fns/products";
 import { listTreatmentsFn } from "@/server-fns/treatments";
 
 const title = "Signature by Lilian — Premium Skincare & Luxury Spa";
@@ -24,14 +24,18 @@ export const Route = createFileRoute("/")({
     ],
   }),
   loader: async () => {
-    const treatments = await listTreatmentsFn();
-    return { treatments };
+    const [treatments, allProducts] = await Promise.all([listTreatmentsFn(), listProductsFn()]);
+    const products = allProducts.filter((p) => !p.isArchived);
+    return { treatments, products };
   },
   component: Home,
 });
 
 function Home() {
-  const { treatments } = Route.useLoaderData();
+  const { treatments: allTreatments, products } = Route.useLoaderData();
+  const treatments = allTreatments.filter((t) => !t.isArchived);
+  const bestSellers = products.filter((p) => p.tag === "Best Seller").slice(0, 4);
+  const featuredProducts = bestSellers.length > 0 ? bestSellers : products.slice(0, 4);
   const featuredTreatments = treatments.filter((t) => t.isFeatured).slice(0, 3);
   const oasisPreview = featuredTreatments.length > 0 ? featuredTreatments : treatments.slice(0, 3);
 
@@ -48,17 +52,9 @@ function Home() {
                 <br />
                 Your Wellbeing.
                 <br />
-                <span className="inline-flex items-center gap-2 sm:gap-3">
-                  <span className="relative inline-block text-plum italic font-bold">
-                    Your Signature.
-                    <SignatureUnderline className="absolute inset-x-0 -bottom-3 h-3 text-plum/80 sm:-bottom-4 sm:h-4" />
-                  </span>
-                  <span
-                    role="img"
-                    aria-hidden="true"
-                    className="h-8 w-8 shrink-0 [&>svg]:h-full [&>svg]:w-full sm:h-11 sm:w-11"
-                    dangerouslySetInnerHTML={{ __html: fingerprintSvg }}
-                  />
+                <span className="relative inline-block text-plum italic font-bold">
+                  Your Signature.
+                  {/* <SignatureUnderline className="absolute inset-x-0 -bottom-3 h-3 text-plum/80 sm:-bottom-4 sm:h-4" /> */}
                 </span>
               </h1>
               <p className="mt-7 max-w-lg text-base leading-relaxed text-muted-foreground">
@@ -185,9 +181,9 @@ function Home() {
           </Reveal>
 
           <div className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-            {products.map((product, i) => (
+            {featuredProducts.map((product, i) => (
               <Reveal key={product.id} delay={i * 90}>
-                <ProductCard product={product} />
+                <ProductCard product={toStoreProduct(product)} />
               </Reveal>
             ))}
           </div>

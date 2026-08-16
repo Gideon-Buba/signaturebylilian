@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Toaster } from "@/components/ui/sonner";
+import { CartProvider } from "@/lib/cart";
 
 function NotFoundComponent() {
   return (
@@ -121,15 +122,17 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex min-h-screen flex-col">
-        {!isAdmin && <SiteHeader />}
-        <main className="flex-1">
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-        </main>
-        {!isAdmin && <SiteFooter />}
-      </div>
-      <Toaster />
+      <CartProvider>
+        <div className="flex min-h-screen flex-col">
+          {!isAdmin && <SiteHeader />}
+          <main className="flex-1">
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+          </main>
+          {!isAdmin && <SiteFooter />}
+        </div>
+        <Toaster />
+      </CartProvider>
     </QueryClientProvider>
   );
 }

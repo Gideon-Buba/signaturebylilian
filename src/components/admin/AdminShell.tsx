@@ -8,6 +8,8 @@ const adminNav = [
   { to: "/admin", label: "Dashboard" },
   { to: "/admin/products", label: "Products" },
   { to: "/admin/treatments", label: "Spa Menu" },
+  { to: "/admin/journal", label: "Journal" },
+  { to: "/admin/orders", label: "Orders" },
 ] as const;
 
 export function AdminShell({

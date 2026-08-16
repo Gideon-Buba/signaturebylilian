@@ -4,13 +4,14 @@ import { Leaf, Sparkles, FlaskConical, Heart } from "lucide-react";
 import heroSkincare from "@/assets/skincare-products-hero.jpeg";
 import { Reveal } from "@/components/Reveal";
 import { ProductCard } from "@/components/ProductCard";
-import { products } from "@/lib/catalog";
+import { toStoreProduct } from "@/lib/product-display";
+import { listProductsFn } from "@/server-fns/products";
 
 const title = "Skincare — Signature by Lilian";
 const description =
   "Shop Signature by Lilian Skincare: serums, creams, cleansers and facial oils crafted to nourish and enhance your natural beauty.";
 
-export const Route = createFileRoute("/skincare")({
+export const Route = createFileRoute("/skincare/")({
   head: () => ({
     meta: [
       { title },
@@ -19,6 +20,11 @@ export const Route = createFileRoute("/skincare")({
       { property: "og:description", content: description },
     ],
   }),
+  loader: async () => {
+    const allProducts = await listProductsFn();
+    const products = allProducts.filter((p) => !p.isArchived);
+    return { products };
+  },
   component: Skincare,
 });
 
@@ -88,6 +94,8 @@ const tips = [
 ];
 
 function Skincare() {
+  const { products } = Route.useLoaderData();
+
   return (
     <>
       <section className="border-b border-border bg-blush/40">
@@ -125,13 +133,19 @@ function Skincare() {
           <p className="eyebrow text-magenta">Featured Products</p>
           <h2 className="mt-4 font-serif text-4xl text-foreground lg:text-5xl">The collection</h2>
         </Reveal>
-        <div className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-          {products.map((p, i) => (
-            <Reveal key={p.id} delay={i * 90}>
-              <ProductCard product={p} />
-            </Reveal>
-          ))}
-        </div>
+        {products.length === 0 ? (
+          <p className="mt-10 text-sm text-muted-foreground">
+            New products are on the way — check back soon.
+          </p>
+        ) : (
+          <div className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+            {products.map((p, i) => (
+              <Reveal key={p.id} delay={i * 90}>
+                <ProductCard product={toStoreProduct(p)} />
+              </Reveal>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="border-y border-border bg-secondary/30">

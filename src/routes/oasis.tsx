@@ -69,7 +69,8 @@ export const Route = createFileRoute("/oasis")({
     ],
   }),
   loader: async () => {
-    const treatments = await listTreatmentsFn();
+    const allTreatments = await listTreatmentsFn();
+    const treatments = allTreatments.filter((t) => !t.isArchived && t.isActive);
     return { treatments };
   },
   component: Oasis,
