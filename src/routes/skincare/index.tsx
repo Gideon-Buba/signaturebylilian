@@ -54,7 +54,7 @@ const pillars = [
 const collections = [
   { name: "The Glow Edit", copy: "Brightening care for dull, uneven tone." },
   { name: "Barrier Repair", copy: "For sensitive, reactive and compromised skin." },
-  { name: "Night Rituals", copy: "Overnight renewal oils, masks and treatments." },
+  { name: "Night routines", copy: "Overnight renewal oils, masks and treatments." },
 ];
 
 const reviews = [

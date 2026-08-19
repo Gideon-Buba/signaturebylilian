@@ -34,7 +34,7 @@ const standard = [
   {
     n: "03",
     title: "Refined",
-    copy: "A sensory experience that makes daily rituals feel indulgent.",
+    copy: "A sensory experience that makes daily routines feel indulgent.",
   },
   { n: "04", title: "Felt", copy: "Skin that feels as good as it looks, and stays that way." },
 ];
@@ -132,8 +132,8 @@ function About() {
             </p>
             <p className="mt-8 leading-relaxed text-primary-foreground/75">
               We combine carefully selected ingredients with a refined sensory experience to create
-              skincare that nourishes, replenishes, refines, and restores, making daily rituals feel
-              quietly indulgent. We are interested in more than just a temporary glow. We are
+              skincare that nourishes, replenishes, refines, and restores, making daily routines
+              feel quietly indulgent. We are interested in more than just a temporary glow. We are
               committed to skin that feels balanced, healthy, and consistently cared for, reflecting
               confidence and self-esteem over time.
             </p>
