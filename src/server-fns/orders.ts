@@ -15,6 +15,8 @@ export type OrderItem = {
   quantity: number;
 };
 
+export type PaymentStatus = "unpaid" | "paid" | "failed";
+
 export type Order = {
   id: string;
   customerName: string;
@@ -24,6 +26,8 @@ export type Order = {
   notes: string;
   status: OrderStatus;
   subtotal: number;
+  paymentStatus: PaymentStatus;
+  paymentReference: string | null;
   createdAt: string;
   items: OrderItem[];
 };
@@ -37,6 +41,8 @@ type OrderRow = {
   notes: string;
   status: string;
   subtotal: number;
+  payment_status: string;
+  payment_reference: string | null;
   created_at: string;
 };
 
@@ -113,7 +119,7 @@ export const createOrderFn = createServerFn({ method: "POST" })
 
     if (itemsError) throw new Error(itemsError.message);
 
-    return { orderId: orderRow.id as string };
+    return { orderId: orderRow.id as string, subtotal };
   });
 
 export const listOrdersFn = createServerFn({ method: "GET" }).handler(async () => {
@@ -148,6 +154,8 @@ export const listOrdersFn = createServerFn({ method: "GET" }).handler(async () =
       notes: row.notes,
       status: row.status as OrderStatus,
       subtotal: row.subtotal,
+      paymentStatus: row.payment_status as PaymentStatus,
+      paymentReference: row.payment_reference,
       createdAt: row.created_at,
       items: itemsByOrder.get(row.id) ?? [],
     }),

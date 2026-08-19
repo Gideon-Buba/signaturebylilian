@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Reveal } from "@/components/Reveal";
 import { useCart } from "@/lib/cart";
 import { NIGERIAN_STATES } from "@/lib/nigeria-states";
 import { createOrderFn } from "@/server-fns/orders";
+import { verifyPaymentFn } from "@/server-fns/payments";
 
 const title = "Checkout — Signature by Lilian";
 
@@ -14,30 +15,154 @@ export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
 
+const PAYSTACK_SCRIPT_SRC = "https://js.paystack.co/v1/inline.js";
+const PAYSTACK_PUBLIC_KEY = import.meta.env["VITE_PAYSTACK_PUBLIC_KEY"] as string | undefined;
+
+declare global {
+  interface Window {
+    PaystackPop?: {
+      setup: (options: {
+        key: string;
+        email: string;
+        amount: number;
+        currency: string;
+        ref: string;
+        onClose: () => void;
+        callback: (response: { reference: string }) => void;
+      }) => { openIframe: () => void };
+    };
+  }
+}
+
+function usePaystackScript() {
+  const [ready, setReady] = useState(
+    typeof window !== "undefined" && Boolean(window.PaystackPop),
+  );
+
+  useEffect(() => {
+    if (ready || typeof document === "undefined") return;
+    const existing = document.querySelector(`script[src="${PAYSTACK_SCRIPT_SRC}"]`);
+    if (existing) {
+      existing.addEventListener("load", () => setReady(true));
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = PAYSTACK_SCRIPT_SRC;
+    script.async = true;
+    script.onload = () => setReady(true);
+    document.body.appendChild(script);
+  }, [ready]);
+
+  return ready;
+}
+
+type PendingOrder = { orderId: string; subtotal: number; email: string };
+
 function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const [submitting, setSubmitting] = useState(false);
-  const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
+  const [pendingOrder, setPendingOrder] = useState<PendingOrder | null>(null);
+  const [completed, setCompleted] = useState(false);
+  const [paidOnline, setPaidOnline] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const paystackReady = usePaystackScript();
 
-  if (placedOrderId) {
+  const payWithPaystack = () => {
+    if (!pendingOrder) return;
+    if (!PAYSTACK_PUBLIC_KEY) {
+      toast.error("Online payment isn't configured yet", {
+        description: "Please choose to pay another way for now.",
+      });
+      return;
+    }
+    if (!paystackReady || !window.PaystackPop) {
+      toast.error("Payment is still loading, please try again in a moment.");
+      return;
+    }
+
+    const handler = window.PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: pendingOrder.email,
+      amount: Math.round(pendingOrder.subtotal * 100),
+      currency: "NGN",
+      ref: pendingOrder.orderId,
+      onClose: () => {
+        toast("Payment window closed", { description: "You can try again whenever you're ready." });
+      },
+      callback: (response) => {
+        setVerifying(true);
+        verifyPaymentFn({ data: { orderId: pendingOrder.orderId, reference: response.reference } })
+          .then(() => {
+            clear();
+            setPaidOnline(true);
+            setCompleted(true);
+          })
+          .catch((error: unknown) => {
+            toast.error("Couldn't confirm payment", {
+              description: error instanceof Error ? error.message : "Please contact us to confirm.",
+            });
+          })
+          .finally(() => setVerifying(false));
+      },
+    });
+    handler.openIframe();
+  };
+
+  if (pendingOrder) {
     return (
       <section className="mx-auto max-w-[1440px] px-5 py-24 text-center lg:px-10">
         <Reveal>
           <p className="eyebrow text-magenta">Order Received</p>
-          <h1 className="mt-4 font-serif text-4xl text-foreground lg:text-5xl">Thank you</h1>
+          <h1 className="mt-4 font-serif text-4xl text-foreground lg:text-5xl">
+            {completed
+              ? paidOnline
+                ? "Payment received"
+                : "Thank you"
+              : "Complete your payment"}
+          </h1>
           <p className="mx-auto mt-4 max-w-md text-muted-foreground">
-            Your order has been received. We'll reach out on the phone number you provided to
-            confirm details and arrange payment — online payment is coming soon.
+            {completed
+              ? paidOnline
+                ? "Thank you — your payment was successful and your order is confirmed. We'll reach out to arrange delivery."
+                : "Your order has been received. We'll reach out on the phone number you provided to confirm details and arrange payment."
+              : "Your order is saved. Pay securely online now, or choose to arrange payment with us directly."}
           </p>
           <p className="mt-2 text-xs tracking-[0.18em] text-muted-foreground uppercase">
-            Order reference: {placedOrderId.slice(0, 8)}
+            Order reference: {pendingOrder.orderId.slice(0, 8)}
           </p>
-          <Link
-            to="/skincare"
-            className="eyebrow mt-9 inline-block bg-plum px-8 py-4 text-primary-foreground transition-colors hover:bg-magenta"
-          >
-            Continue Shopping
-          </Link>
+          <p className="mt-6 font-serif text-2xl text-foreground">
+            ₦{pendingOrder.subtotal.toLocaleString()}
+          </p>
+
+          {completed ? (
+            <Link
+              to="/skincare"
+              className="eyebrow mt-9 inline-block bg-plum px-8 py-4 text-primary-foreground transition-colors hover:bg-magenta"
+            >
+              Continue Shopping
+            </Link>
+          ) : (
+            <div className="mt-9 flex flex-col items-center gap-3">
+              <button
+                type="button"
+                onClick={payWithPaystack}
+                disabled={verifying}
+                className="eyebrow block w-full max-w-xs bg-plum px-8 py-4 text-center text-primary-foreground transition-colors hover:bg-magenta disabled:opacity-60 sm:w-auto"
+              >
+                {verifying ? "Confirming Payment…" : "Pay Now with Paystack"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  clear();
+                  setCompleted(true);
+                }}
+                className="eyebrow text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                I'll arrange payment another way
+              </button>
+            </div>
+          )}
         </Reveal>
       </section>
     );
@@ -110,8 +235,11 @@ function CheckoutPage() {
                     })),
                   },
                 });
-                clear();
-                setPlacedOrderId(result.orderId);
+                setPendingOrder({
+                  orderId: result.orderId,
+                  subtotal: result.subtotal,
+                  email: email || `${phone.replace(/\D/g, "") || "guest"}@guest.signaturebylilian.com`,
+                });
               } catch (error) {
                 toast.error("Couldn't place order", {
                   description: error instanceof Error ? error.message : "Please try again.",
@@ -195,7 +323,8 @@ function CheckoutPage() {
               </span>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              Payment is arranged after we confirm your order — online payment is coming soon.
+              You'll be able to pay securely online with Paystack on the next step, or arrange
+              payment with us directly.
             </p>
             <button
               type="submit"
@@ -203,7 +332,7 @@ function CheckoutPage() {
               disabled={submitting}
               className="eyebrow mt-7 block w-full bg-plum py-4 text-center text-primary-foreground transition-colors hover:bg-magenta disabled:opacity-50"
             >
-              {submitting ? "Placing Order…" : "Place Order"}
+              {submitting ? "Placing Order…" : "Continue to Payment"}
             </button>
           </div>
         </Reveal>
