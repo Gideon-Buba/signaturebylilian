@@ -90,25 +90,26 @@ export const createOrderFn = createServerFn({ method: "POST" })
     const supabase = getSupabaseServerClient();
     const subtotal = data.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .insert({
-        customer_name: data.customerName,
-        phone: data.phone,
-        email: data.email ? data.email : null,
-        address: data.address,
-        notes: data.notes,
-        subtotal,
-      })
-      .select("*")
-      .single();
+    // Guest checkout can INSERT into orders but can't SELECT it back (that's
+    // admin-only) — .select().single() after insert would fail on the
+    // implicit RETURNING read, so generate the id ourselves instead.
+    const orderId = crypto.randomUUID();
+
+    const { error: orderError } = await supabase.from("orders").insert({
+      id: orderId,
+      customer_name: data.customerName,
+      phone: data.phone,
+      email: data.email ? data.email : null,
+      address: data.address,
+      notes: data.notes,
+      subtotal,
+    });
 
     if (orderError) throw new Error(orderError.message);
-    const orderRow = order as OrderRow;
 
     const { error: itemsError } = await supabase.from("order_items").insert(
       data.items.map((item) => ({
-        order_id: orderRow.id,
+        order_id: orderId,
         product_id: item.productId,
         product_name: item.productName,
         size: item.size ?? null,
@@ -119,7 +120,7 @@ export const createOrderFn = createServerFn({ method: "POST" })
 
     if (itemsError) throw new Error(itemsError.message);
 
-    return { orderId: orderRow.id as string, subtotal };
+    return { orderId, subtotal };
   });
 
 export const listOrdersFn = createServerFn({ method: "GET" }).handler(async () => {
