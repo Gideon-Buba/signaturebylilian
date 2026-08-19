@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { getSupabaseAdminClient, getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseAdminClient } from "@/lib/supabase/server";
 
 type PaystackVerifyResponse = {
   status: boolean;
@@ -24,8 +24,12 @@ export const verifyPaymentFn = createServerFn({ method: "POST" })
       );
     }
 
-    const supabase = getSupabaseServerClient();
-    const { data: order, error: orderError } = await supabase
+    // Guest customers can't SELECT their own order back (RLS restricts reads
+    // to admins) — this read is server-only and just cross-checks the
+    // subtotal against what Paystack verified, so the admin client is safe
+    // to use here too.
+    const admin = getSupabaseAdminClient();
+    const { data: order, error: orderError } = await admin
       .from("orders")
       .select("id, subtotal, payment_status")
       .eq("id", data.orderId)
@@ -57,7 +61,6 @@ export const verifyPaymentFn = createServerFn({ method: "POST" })
     // RLS restricts order updates to admins — this write is only reachable
     // after the Paystack verification above has independently confirmed the
     // payment, so bypassing RLS here (via the service-role client) is safe.
-    const admin = getSupabaseAdminClient();
     const { error: updateError } = await admin
       .from("orders")
       .update({
