@@ -48,7 +48,7 @@ function OrdersList() {
 
       {!isLoading && (orders ?? []).length > 0 && (
         <div className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[820px] border-collapse text-left text-sm">
+          <table className="w-full min-w-[920px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-border text-xs tracking-[0.12em] text-muted-foreground uppercase">
                 <th className="py-3 pr-4 font-normal">Date</th>
@@ -56,6 +56,7 @@ function OrdersList() {
                 <th className="py-3 pr-4 font-normal">Phone</th>
                 <th className="py-3 pr-4 font-normal">Items</th>
                 <th className="py-3 pr-4 font-normal">Total</th>
+                <th className="py-3 pr-4 font-normal">Payment</th>
                 <th className="py-3 pr-4 font-normal">Status</th>
               </tr>
             </thead>
@@ -77,6 +78,13 @@ function OrdersList() {
                     </td>
                     <td className="py-3 pr-4 text-foreground">
                       ₦{order.subtotal.toLocaleString()}
+                    </td>
+                    <td className="py-3 pr-4">
+                      <span
+                        className={`eyebrow text-[10px] ${order.paymentStatus === "paid" ? "text-emerald-600" : order.paymentStatus === "failed" ? "text-destructive" : "text-muted-foreground"}`}
+                      >
+                        {order.paymentStatus}
+                      </span>
                     </td>
                     <td className="py-3 pr-4" onClick={(e) => e.stopPropagation()}>
                       <select
@@ -100,7 +108,7 @@ function OrdersList() {
                   </tr>
                   {expanded === order.id && (
                     <tr key={`${order.id}-detail`} className="border-b border-border/60 bg-secondary/20">
-                      <td colSpan={6} className="px-4 py-4">
+                      <td colSpan={7} className="px-4 py-4">
                         <div className="grid gap-4 sm:grid-cols-2">
                           <div>
                             <p className="eyebrow text-muted-foreground">Delivery Address</p>
