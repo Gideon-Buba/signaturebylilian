@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Copy, MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -63,6 +64,15 @@ const BANK_DETAILS = {
   accountNumber: "0000000000",
 };
 
+const WHATSAPP_LINK = "https://wa.me/2349046004543";
+
+function copyToClipboard(value: string, label: string) {
+  navigator.clipboard
+    .writeText(value)
+    .then(() => toast.success(`${label} copied`))
+    .catch(() => toast.error(`Couldn't copy ${label.toLowerCase()}`));
+}
+
 function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const [submitting, setSubmitting] = useState(false);
@@ -115,6 +125,7 @@ function CheckoutPage() {
   };
 
   if (pendingOrder) {
+    const reference = pendingOrder.orderId.slice(0, 8);
     return (
       <section className="mx-auto max-w-[1440px] px-5 py-24 text-center lg:px-10">
         <Reveal>
@@ -129,9 +140,19 @@ function CheckoutPage() {
                 : "Your order has been received. We'll confirm your transfer and reach out on the phone number you provided."
               : "Your order is saved. Pay securely online now, or choose to arrange payment with us directly."}
           </p>
-          <p className="mt-2 text-xs tracking-[0.18em] text-muted-foreground uppercase">
-            Order reference: {pendingOrder.orderId.slice(0, 8)}
-          </p>
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <p className="text-xs tracking-[0.18em] text-muted-foreground uppercase">
+              Order reference: {reference}
+            </p>
+            <button
+              type="button"
+              onClick={() => copyToClipboard(reference, "Reference")}
+              aria-label="Copy order reference"
+              className="text-muted-foreground transition-colors hover:text-accent"
+            >
+              <Copy className="size-3.5" />
+            </button>
+          </div>
           <p className="mt-6 font-serif text-2xl text-foreground">
             ₦{pendingOrder.subtotal.toLocaleString()}
           </p>
@@ -169,8 +190,29 @@ function CheckoutPage() {
                 </dl>
                 <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
                   Transfer ₦{pendingOrder.subtotal.toLocaleString()} and share your payment receipt
-                  with us on WhatsApp, quoting your order reference above.
+                  with us on WhatsApp, quoting your order reference.
                 </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <a
+                    href={`${WHATSAPP_LINK}?text=${encodeURIComponent(
+                      `Hi, I just made a bank transfer for order ${reference} (₦${pendingOrder.subtotal.toLocaleString()}). Here's my payment receipt:`,
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="eyebrow inline-flex items-center gap-2 border border-border px-4 py-3 text-foreground transition-colors hover:border-accent hover:text-accent"
+                  >
+                    <MessageCircle className="size-4" />
+                    Message on WhatsApp
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(reference, "Reference")}
+                    className="eyebrow inline-flex items-center gap-2 border border-border px-4 py-3 text-foreground transition-colors hover:border-accent hover:text-accent"
+                  >
+                    <Copy className="size-4" />
+                    Copy Reference
+                  </button>
+                </div>
               </div>
               <button
                 type="button"
