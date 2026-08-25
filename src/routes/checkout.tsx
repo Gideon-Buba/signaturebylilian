@@ -192,25 +192,25 @@ function CheckoutPage() {
                   Transfer ₦{pendingOrder.subtotal.toLocaleString()} and share your payment receipt
                   with us on WhatsApp, quoting your order reference.
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-4 grid grid-cols-2 gap-2">
                   <a
                     href={`${WHATSAPP_LINK}?text=${encodeURIComponent(
                       `Hi, I just made a bank transfer for order ${reference} (₦${pendingOrder.subtotal.toLocaleString()}). Here's my payment receipt:`,
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="eyebrow inline-flex items-center gap-2 border border-border px-4 py-3 text-foreground transition-colors hover:border-accent hover:text-accent"
+                    className="eyebrow inline-flex items-center justify-center gap-2 border border-border px-3 py-3 text-center text-foreground transition-colors hover:border-accent hover:text-accent"
                   >
-                    <MessageCircle className="size-4" />
-                    Message on WhatsApp
+                    <MessageCircle className="size-4 shrink-0" />
+                    WhatsApp
                   </a>
                   <button
                     type="button"
                     onClick={() => copyToClipboard(reference, "Reference")}
-                    className="eyebrow inline-flex items-center gap-2 border border-border px-4 py-3 text-foreground transition-colors hover:border-accent hover:text-accent"
+                    className="eyebrow inline-flex items-center justify-center gap-2 border border-border px-3 py-3 text-center text-foreground transition-colors hover:border-accent hover:text-accent"
                   >
-                    <Copy className="size-4" />
-                    Copy Reference
+                    <Copy className="size-4 shrink-0" />
+                    Copy Ref
                   </button>
                 </div>
               </div>
