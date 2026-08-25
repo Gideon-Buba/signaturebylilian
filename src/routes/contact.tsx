@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Clock, Instagram, Mail, MapPin, Phone } from "lucide-react";
+import { Clock, Instagram, Mail, MapPin, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { Reveal } from "@/components/Reveal";
+
+const WHATSAPP_LINK = "https://wa.me/2349046004543";
 
 const title = "Contact & Bookings — Signature by Lilian";
 const description =
@@ -21,7 +23,7 @@ export const Route = createFileRoute("/contact")({
 });
 
 const details = [
-  { icon: Phone, label: "Phone", value: "+234 703 205 0584", href: "tel:+2347032050584" },
+  { icon: MessageCircle, label: "WhatsApp", value: "09046004543", href: WHATSAPP_LINK },
   {
     icon: Instagram,
     label: "Instagram — Skincare",
@@ -37,8 +39,8 @@ const details = [
   {
     icon: Mail,
     label: "Email",
-    value: "DrLilian@signaturebylilian.com",
-    href: "mailto:DrLilian@signaturebylilian.com",
+    value: "info@signaturebylilian.com",
+    href: "mailto:info@signaturebylilian.com",
   },
   {
     icon: MapPin,
@@ -46,7 +48,7 @@ const details = [
     value: "No 2 Omako Street, Off No 3 Stephen Ocheni Street, Wuye, Abuja",
     href: "https://maps.app.goo.gl/fRzY7R86oMdSDaHZA",
   },
-  { icon: Clock, label: "Hours", value: "Mon–Sat 9:00–18:30 · Sun by appointment" },
+  { icon: Clock, label: "Hours", value: "Mon–Sat 9:00 am – 6:00 pm · Sun by appointment" },
 ];
 
 function Contact() {

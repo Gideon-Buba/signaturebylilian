@@ -92,9 +92,13 @@ function groupByCategory(treatments: Treatment[]) {
   return orderedKeys.map((category) => [category, map.get(category)!] as const);
 }
 
-function formatPrice(price: number | null) {
-  return price != null ? `₦${price.toLocaleString()}` : "Contact for pricing";
+function formatPrice(price: number | null, startingFrom = false) {
+  if (price == null) return "Contact for pricing";
+  return startingFrom ? `From ₦${price.toLocaleString()}` : `₦${price.toLocaleString()}`;
 }
+
+const WHATSAPP_NUMBER = "2349046004543";
+const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 
 export const Route = createFileRoute("/oasis")({
   head: () => ({
@@ -213,7 +217,9 @@ function Oasis() {
                 <Reveal key={t.id} delay={i * 80} className="bg-background p-8 lg:p-12">
                   <div className="flex flex-wrap items-baseline justify-between gap-4">
                     <h3 className="font-serif text-3xl text-foreground">{t.name}</h3>
-                    <span className="font-serif text-2xl text-accent">{formatPrice(t.price)}</span>
+                    <span className="font-serif text-2xl text-accent">
+                      {formatPrice(t.price, t.category === "IV Therapy")}
+                    </span>
                   </div>
                   {t.duration && <p className="eyebrow mt-3 text-muted-foreground">{t.duration}</p>}
                   {t.description && (
@@ -282,9 +288,7 @@ function Oasis() {
 
           <Reveal delay={100} className="mt-10 min-w-0 border border-border/70 p-8 lg:mt-0 lg:p-12">
             <div className="flex items-baseline justify-between gap-4 border-b border-border pb-5">
-              <h3 className="font-serif text-2xl text-foreground lg:text-3xl">
-                {activeCategory}
-              </h3>
+              <h3 className="font-serif text-2xl text-foreground lg:text-3xl">{activeCategory}</h3>
               <span className="eyebrow shrink-0 text-muted-foreground">
                 {activeItems.length} treatment{activeItems.length === 1 ? "" : "s"}
               </span>
@@ -304,7 +308,7 @@ function Oasis() {
                     className="mx-1 h-px min-w-4 flex-1 translate-y-[-4px] border-b border-dotted border-border"
                   />
                   <span className="shrink-0 font-serif text-lg text-accent">
-                    {formatPrice(t.price)}
+                    {formatPrice(t.price, t.category === "IV Therapy")}
                   </span>
                 </div>
               ))}
@@ -403,12 +407,18 @@ function BookingSection({ treatments }: { treatments: Treatment[] }) {
           </p>
           <dl className="mt-10 space-y-5 text-sm">
             <div>
-              <dt className="eyebrow text-muted-foreground">Call or WhatsApp</dt>
-              <dd className="mt-2 font-serif text-xl text-foreground">+234 703 205 0584</dd>
+              <dt className="eyebrow text-muted-foreground">WhatsApp</dt>
+              <dd className="mt-2 font-serif text-xl text-foreground">
+                <a href={WHATSAPP_LINK} className="transition-colors hover:text-accent">
+                  09046004543
+                </a>
+              </dd>
             </div>
             <div>
               <dt className="eyebrow text-muted-foreground">Opening hours</dt>
-              <dd className="mt-2 text-foreground">Mon–Sat, 9:00 — 18:30 · Sun by appointment</dd>
+              <dd className="mt-2 text-foreground">
+                Mon–Sat, 9:00 am – 6:00 pm · Sun by appointment
+              </dd>
             </div>
           </dl>
         </Reveal>
@@ -461,7 +471,8 @@ function BookingSection({ treatments }: { treatments: Treatment[] }) {
                     {items.map((t) => (
                       <option key={t.id} value={t.id}>
                         {t.name}
-                        {t.duration ? ` — ${t.duration}` : ""} · {formatPrice(t.price)}
+                        {t.duration ? ` — ${t.duration}` : ""} ·{" "}
+                        {formatPrice(t.price, category === "IV Therapy")}
                       </option>
                     ))}
                   </optgroup>

@@ -35,9 +35,7 @@ declare global {
 }
 
 function usePaystackScript() {
-  const [ready, setReady] = useState(
-    typeof window !== "undefined" && Boolean(window.PaystackPop),
-  );
+  const [ready, setReady] = useState(typeof window !== "undefined" && Boolean(window.PaystackPop));
 
   useEffect(() => {
     if (ready || typeof document === "undefined") return;
@@ -58,10 +56,18 @@ function usePaystackScript() {
 
 type PendingOrder = { orderId: string; subtotal: number; email: string };
 
+// TODO: placeholder — replace with Dr Lilian's real bank details.
+const BANK_DETAILS = {
+  bankName: "Bank name to be confirmed",
+  accountName: "Signature by Lilian",
+  accountNumber: "0000000000",
+};
+
 function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const [submitting, setSubmitting] = useState(false);
   const [pendingOrder, setPendingOrder] = useState<PendingOrder | null>(null);
+  const [showBankDetails, setShowBankDetails] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [paidOnline, setPaidOnline] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -114,17 +120,13 @@ function CheckoutPage() {
         <Reveal>
           <p className="eyebrow text-magenta">Order Received</p>
           <h1 className="mt-4 font-serif text-4xl text-foreground lg:text-5xl">
-            {completed
-              ? paidOnline
-                ? "Payment received"
-                : "Thank you"
-              : "Complete your payment"}
+            {completed ? (paidOnline ? "Payment received" : "Thank you") : "Complete your payment"}
           </h1>
           <p className="mx-auto mt-4 max-w-md text-muted-foreground">
             {completed
               ? paidOnline
                 ? "Thank you — your payment was successful and your order is confirmed. We'll reach out to arrange delivery."
-                : "Your order has been received. We'll reach out on the phone number you provided to confirm details and arrange payment."
+                : "Your order has been received. We'll confirm your transfer and reach out on the phone number you provided."
               : "Your order is saved. Pay securely online now, or choose to arrange payment with us directly."}
           </p>
           <p className="mt-2 text-xs tracking-[0.18em] text-muted-foreground uppercase">
@@ -134,6 +136,12 @@ function CheckoutPage() {
             ₦{pendingOrder.subtotal.toLocaleString()}
           </p>
 
+          {completed && (
+            <p className="mx-auto mt-5 max-w-sm text-sm text-muted-foreground italic">
+              Please note this number for your transaction.
+            </p>
+          )}
+
           {completed ? (
             <Link
               to="/skincare"
@@ -141,6 +149,40 @@ function CheckoutPage() {
             >
               Continue Shopping
             </Link>
+          ) : showBankDetails ? (
+            <div className="mx-auto mt-9 max-w-sm text-left">
+              <div className="border border-border bg-card p-6">
+                <p className="eyebrow text-muted-foreground">Bank Transfer Details</p>
+                <dl className="mt-4 space-y-3 text-sm">
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-muted-foreground">Bank Name</dt>
+                    <dd className="text-foreground">{BANK_DETAILS.bankName}</dd>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-muted-foreground">Account Name</dt>
+                    <dd className="text-foreground">{BANK_DETAILS.accountName}</dd>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-muted-foreground">Account Number</dt>
+                    <dd className="text-foreground">{BANK_DETAILS.accountNumber}</dd>
+                  </div>
+                </dl>
+                <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
+                  Transfer ₦{pendingOrder.subtotal.toLocaleString()} and share your payment receipt
+                  with us on WhatsApp, quoting your order reference above.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  clear();
+                  setCompleted(true);
+                }}
+                className="eyebrow mt-5 block w-full bg-plum py-4 text-center text-primary-foreground transition-colors hover:bg-magenta"
+              >
+                I've Sent the Transfer
+              </button>
+            </div>
           ) : (
             <div className="mt-9 flex flex-col items-center gap-3">
               <button
@@ -153,10 +195,7 @@ function CheckoutPage() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  clear();
-                  setCompleted(true);
-                }}
+                onClick={() => setShowBankDetails(true)}
                 className="eyebrow text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
                 I'll arrange payment another way
@@ -191,9 +230,7 @@ function CheckoutPage() {
     <section className="mx-auto max-w-[1440px] px-5 py-16 lg:px-10 lg:py-24">
       <Reveal>
         <p className="eyebrow text-magenta">Checkout</p>
-        <h1 className="mt-4 font-serif text-4xl text-foreground lg:text-5xl">
-          Delivery details
-        </h1>
+        <h1 className="mt-4 font-serif text-4xl text-foreground lg:text-5xl">Delivery details</h1>
       </Reveal>
 
       <div className="mt-12 grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
@@ -238,7 +275,8 @@ function CheckoutPage() {
                 setPendingOrder({
                   orderId: result.orderId,
                   subtotal: result.subtotal,
-                  email: email || `${phone.replace(/\D/g, "") || "guest"}@guest.signaturebylilian.com`,
+                  email:
+                    email || `${phone.replace(/\D/g, "") || "guest"}@guest.signaturebylilian.com`,
                 });
               } catch (error) {
                 toast.error("Couldn't place order", {
