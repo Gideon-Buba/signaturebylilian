@@ -6,7 +6,7 @@ import { listJournalPostsFn } from "@/server-fns/journal";
 
 const title = "Journal — Beauty & Wellness Notes | Signature by Lilian";
 const description =
-  "Skincare routines, ingredient education, wellness rituals and self-care notes from the Signature by Lilian team.";
+  "Skincare routines, ingredient education, wellness routines and self-care notes from the Signature by Lilian team.";
 
 export const Route = createFileRoute("/journal/")({
   head: () => ({
@@ -93,9 +93,7 @@ function Journal() {
                   {lead.title}
                 </h2>
               </Link>
-              <p className="mt-5 max-w-lg leading-relaxed text-muted-foreground">
-                {lead.excerpt}
-              </p>
+              <p className="mt-5 max-w-lg leading-relaxed text-muted-foreground">{lead.excerpt}</p>
               <p className="mt-6 text-xs tracking-[0.18em] text-muted-foreground uppercase">
                 {lead.publishedAt && new Date(lead.publishedAt).toLocaleDateString()}
                 {lead.readTime && ` · ${lead.readTime} read`}
@@ -124,9 +122,7 @@ function Journal() {
                 <h3 className="mt-3 font-serif text-2xl leading-snug text-foreground transition-colors group-hover:text-plum">
                   {post.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  {post.excerpt}
-                </p>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{post.excerpt}</p>
                 <p className="mt-5 text-xs tracking-[0.18em] text-muted-foreground uppercase">
                   {post.publishedAt && new Date(post.publishedAt).toLocaleDateString()}
                   {post.readTime && ` · ${post.readTime} read`}

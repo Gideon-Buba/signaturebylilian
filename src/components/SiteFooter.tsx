@@ -28,6 +28,7 @@ const columns = [
 
 const SKINCARE_INSTAGRAM = "https://www.instagram.com/sbl.skincare?igsh=MWExdjYyeHJ2dWpycg==";
 const OASIS_INSTAGRAM = "https://www.instagram.com/sbl_oasis?igsh=MTNvMjNpd2F0ZGhlNg==";
+const WHATSAPP_LINK = "https://wa.me/2349046004543";
 
 export function SiteFooter() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -35,7 +36,7 @@ export function SiteFooter() {
   const logo = isOasis ? oasisLogo : skincareLogo;
   const social = [
     { label: "Instagram", href: isOasis ? OASIS_INSTAGRAM : SKINCARE_INSTAGRAM },
-    { label: "WhatsApp", href: "#" },
+    { label: "WhatsApp", href: WHATSAPP_LINK },
   ];
 
   return (

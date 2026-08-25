@@ -12,7 +12,7 @@ import { listTreatmentsFn } from "@/server-fns/treatments";
 
 const title = "Signature by Lilian — Premium Skincare & Luxury Spa";
 const description =
-  "Discover Signature by Lilian: thoughtfully crafted skincare and the restorative wellness rituals of Signature by Lilian Oasis.";
+  "Discover Signature by Lilian: thoughtfully crafted skincare and the restorative wellness routines of Signature by Lilian Oasis.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -199,7 +199,7 @@ function Home() {
               Step away from the everyday
             </h2>
             <p className="mt-6 max-w-md leading-relaxed text-muted-foreground">
-              Warm light, quiet rooms and therapists who take their time. Every ritual at Oasis is
+              Warm light, quiet rooms and therapists who take their time. Every routine at Oasis is
               built around one thing — how you feel when you leave.
             </p>
             <ul className="mt-10 divide-y divide-border border-y border-border">
@@ -245,7 +245,7 @@ function Home() {
         <Reveal className="border border-border px-6 py-14 text-center lg:px-20 lg:py-20">
           <p className="eyebrow text-muted-foreground">The Journal</p>
           <h2 className="mx-auto mt-5 max-w-2xl font-serif text-3xl leading-tight text-foreground lg:text-4xl">
-            Skincare knowledge, wellness rituals and the quiet art of taking care of yourself.
+            Skincare knowledge, wellness routines and the quiet art of taking care of yourself.
           </h2>
           <Link
             to="/journal"
