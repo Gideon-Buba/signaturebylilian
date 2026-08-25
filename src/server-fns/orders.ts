@@ -29,6 +29,7 @@ export type Order = {
   paymentStatus: PaymentStatus;
   paymentReference: string | null;
   createdAt: string;
+  updatedAt: string;
   items: OrderItem[];
 };
 
@@ -44,6 +45,7 @@ type OrderRow = {
   payment_status: string;
   payment_reference: string | null;
   created_at: string;
+  updated_at: string;
 };
 
 type OrderItemRow = {
@@ -158,6 +160,7 @@ export const listOrdersFn = createServerFn({ method: "GET" }).handler(async () =
       paymentStatus: row.payment_status as PaymentStatus,
       paymentReference: row.payment_reference,
       createdAt: row.created_at,
+      updatedAt: row.updated_at,
       items: itemsByOrder.get(row.id) ?? [],
     }),
   );
