@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Reveal } from "@/components/Reveal";
 import { useCart } from "@/lib/cart";
+import { copyToClipboard } from "@/lib/clipboard";
 import { NIGERIAN_STATES } from "@/lib/nigeria-states";
 import { createOrderFn } from "@/server-fns/orders";
 import { verifyPaymentFn } from "@/server-fns/payments";
@@ -65,13 +66,6 @@ const BANK_DETAILS = {
 };
 
 const WHATSAPP_LINK = "https://wa.me/2349046004543";
-
-function copyToClipboard(value: string, label: string) {
-  navigator.clipboard
-    .writeText(value)
-    .then(() => toast.success(`${label} copied`))
-    .catch(() => toast.error(`Couldn't copy ${label.toLowerCase()}`));
-}
 
 function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
