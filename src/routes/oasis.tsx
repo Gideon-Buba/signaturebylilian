@@ -179,7 +179,7 @@ function Oasis() {
         <Reveal>
           <p className="eyebrow text-gold">The Oasis Experience</p>
           <h2 className="mt-5 font-serif text-4xl leading-tight text-foreground lg:text-5xl">
-            Time, warmth and complete quiet
+            Time, warmth and complete serenity
           </h2>
           <p className="mt-6 leading-relaxed text-muted-foreground">
             From the moment the door closes behind you, the pace changes. Tea in the lounge, warm
@@ -407,10 +407,10 @@ function BookingSection({ treatments }: { treatments: Treatment[] }) {
           </p>
           <dl className="mt-10 space-y-5 text-sm">
             <div>
-              <dt className="eyebrow text-muted-foreground">WhatsApp</dt>
+              <dt className="eyebrow text-muted-foreground">Call/WhatsApp</dt>
               <dd className="mt-2 font-serif text-xl text-foreground">
                 <a href={WHATSAPP_LINK} className="transition-colors hover:text-accent">
-                  09046004543
+                  09130123123
                 </a>
               </dd>
             </div>
