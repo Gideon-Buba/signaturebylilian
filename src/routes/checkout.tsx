@@ -60,9 +60,9 @@ type PendingOrder = { orderId: string; subtotal: number; email: string };
 
 // TODO: placeholder — replace with Dr Lilian's real bank details.
 const BANK_DETAILS = {
-  bankName: "Bank name to be confirmed",
+  bankName: "Premium Trust Bank",
   accountName: "Signature by Lilian",
-  accountNumber: "0000000000",
+  accountNumber: "0160069521",
 };
 
 const WHATSAPP_LINK = "https://wa.me/2349046004543";
