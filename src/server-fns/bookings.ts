@@ -2,7 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireAdmin } from "@/lib/auth/session";
+import { sendEmail } from "@/lib/email";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+
+const BOOKING_NOTIFICATION_EMAIL = "bookings@signaturebylilian.com";
 
 export type BookingStatus = "pending" | "confirmed" | "completed" | "cancelled";
 
@@ -61,6 +64,29 @@ const createBookingInput = z.object({
   notes: z.string().trim().default(""),
 });
 
+function bookingNotificationHtml(data: z.infer<typeof createBookingInput>) {
+  const row = (label: string, value: string) =>
+    `<tr><td style="padding:4px 12px 4px 0;color:#666;white-space:nowrap;">${label}</td><td style="padding:4px 0;"><strong>${value}</strong></td></tr>`;
+
+  return `
+    <div style="font-family:sans-serif;font-size:15px;color:#222;">
+      <p>A new appointment request came in on the website.</p>
+      <table cellpadding="0" cellspacing="0">
+        ${row("Name", data.customerName)}
+        ${row("Phone", data.phone)}
+        ${data.email ? row("Email", data.email) : ""}
+        ${row("Treatment", data.treatmentName)}
+        ${data.preferredDate ? row("Preferred date", data.preferredDate) : ""}
+        ${data.preferredTime ? row("Preferred time", data.preferredTime) : ""}
+        ${data.notes ? row("Notes", data.notes) : ""}
+      </table>
+      <p style="margin-top:16px;">
+        <a href="https://signaturebylilian.com/admin/bookings">View in the admin dashboard</a>
+      </p>
+    </div>
+  `;
+}
+
 export const createBookingFn = createServerFn({ method: "POST" })
   .validator(createBookingInput)
   .handler(async ({ data }) => {
@@ -77,6 +103,18 @@ export const createBookingFn = createServerFn({ method: "POST" })
     });
 
     if (error) throw new Error(error.message);
+
+    // Notification only — a failed email must never fail the booking itself.
+    try {
+      await sendEmail({
+        to: BOOKING_NOTIFICATION_EMAIL,
+        subject: `New booking: ${data.customerName} — ${data.treatmentName}`,
+        html: bookingNotificationHtml(data),
+      });
+    } catch (emailError) {
+      console.error("Failed to send booking notification email:", emailError);
+    }
+
     return { success: true as const };
   });
 
