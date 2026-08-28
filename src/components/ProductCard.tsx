@@ -9,6 +9,7 @@ export type StoreProduct = {
   size: string | null;
   blurb: string;
   price: number;
+  compareAtPrice: number | null;
   tag: "Best Seller" | "New" | "Signature";
   image: string | null;
   benefits: string[];
@@ -55,8 +56,15 @@ export function ProductCard({ product }: { product: StoreProduct }) {
           {product.blurb}
         </p>
         <div className="mt-4 flex items-center justify-between gap-4 pt-1">
-          <span className="font-serif text-xl text-foreground">
-            ₦{product.price.toLocaleString()}
+          <span className="flex flex-wrap items-baseline gap-x-2">
+            {product.compareAtPrice != null && product.compareAtPrice > product.price && (
+              <span className="text-sm text-muted-foreground line-through">
+                ₦{product.compareAtPrice.toLocaleString()}
+              </span>
+            )}
+            <span className="font-serif text-xl text-foreground">
+              ₦{product.price.toLocaleString()}
+            </span>
           </span>
           <button
             type="button"
@@ -78,6 +86,11 @@ export function ProductCard({ product }: { product: StoreProduct }) {
             Add to Cart
           </button>
         </div>
+        {product.compareAtPrice != null && product.compareAtPrice > product.price && (
+          <p className="mt-2 text-xs text-plum">
+            Save ₦{(product.compareAtPrice - product.price).toLocaleString()}
+          </p>
+        )}
       </div>
     </article>
   );

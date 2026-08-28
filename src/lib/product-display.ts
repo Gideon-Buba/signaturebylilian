@@ -8,6 +8,7 @@ export function toStoreProduct(product: Product): StoreProduct {
     size: product.size,
     blurb: product.description,
     price: product.price,
+    compareAtPrice: product.compareAtPrice,
     tag: product.tag,
     image: product.imageUrl,
     benefits: product.benefits,

@@ -113,9 +113,21 @@ function ProductDetail() {
           {product.size && (
             <p className="mt-2 text-sm text-muted-foreground">{product.size}</p>
           )}
-          <p className="mt-6 font-serif text-2xl text-foreground">
-            ₦{product.price.toLocaleString()}
-          </p>
+          <div className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            {product.compareAtPrice != null && product.compareAtPrice > product.price && (
+              <span className="text-lg text-muted-foreground line-through">
+                ₦{product.compareAtPrice.toLocaleString()}
+              </span>
+            )}
+            <span className="font-serif text-2xl text-foreground">
+              ₦{product.price.toLocaleString()}
+            </span>
+          </div>
+          {product.compareAtPrice != null && product.compareAtPrice > product.price && (
+            <p className="eyebrow mt-2 text-plum">
+              Save ₦{(product.compareAtPrice - product.price).toLocaleString()}
+            </p>
+          )}
           <p className="mt-6 max-w-md leading-relaxed text-muted-foreground">
             {product.description}
           </p>
