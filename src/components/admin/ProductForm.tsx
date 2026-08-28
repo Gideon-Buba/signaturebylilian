@@ -9,6 +9,7 @@ export type ProductFormValues = {
   size: string;
   description: string;
   price: string;
+  compareAtPrice: string;
   tag: "Best Seller" | "New" | "Signature";
   benefits: string;
   inStock: boolean;
@@ -29,6 +30,7 @@ export function ProductForm({
     size?: string;
     description: string;
     price: number;
+    compareAtPrice?: number | null;
     tag: ProductFormValues["tag"];
     benefits: string[];
     inStock: boolean;
@@ -42,6 +44,7 @@ export function ProductForm({
     size: initial?.size ?? "",
     description: initial?.description ?? "",
     price: initial?.price ?? "",
+    compareAtPrice: initial?.compareAtPrice ?? "",
     tag: initial?.tag ?? "New",
     benefits: initial?.benefits ?? "",
     inStock: initial?.inStock ?? true,
@@ -115,6 +118,13 @@ export function ProductForm({
           return;
         }
 
+        const trimmedCompareAt = values.compareAtPrice.trim();
+        const compareAtPrice = trimmedCompareAt ? Number(trimmedCompareAt) : null;
+        if (compareAtPrice != null && (!Number.isFinite(compareAtPrice) || compareAtPrice < 0)) {
+          toast.error("Enter a valid compare-at price");
+          return;
+        }
+
         const trimmedSize = values.size.trim();
 
         setSubmitting(true);
@@ -123,6 +133,7 @@ export function ProductForm({
             name: values.name.trim(),
             description: values.description,
             price,
+            compareAtPrice,
             tag: values.tag,
             benefits: values.benefits
               .split("\n")
@@ -244,6 +255,23 @@ export function ProductForm({
             className="border border-input bg-background px-4 py-3.5 text-sm text-foreground outline-none focus:border-accent"
           />
         </label>
+        <label className="grid gap-2">
+          <span className="eyebrow text-muted-foreground">
+            Compare-at price (₦, optional)
+          </span>
+          <input
+            type="number"
+            min={0}
+            step={1}
+            placeholder="Original price before discount"
+            value={values.compareAtPrice}
+            onChange={(e) => setValues((v) => ({ ...v, compareAtPrice: e.target.value }))}
+            className="border border-input bg-background px-4 py-3.5 text-sm text-foreground outline-none focus:border-accent"
+          />
+        </label>
+      </div>
+
+      <div className="grid gap-5 sm:grid-cols-2">
         <label className="grid gap-2">
           <span className="eyebrow text-muted-foreground">Tag</span>
           <select

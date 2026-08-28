@@ -97,9 +97,6 @@ function formatPrice(price: number | null, startingFrom = false) {
   return startingFrom ? `From ₦${price.toLocaleString()}` : `₦${price.toLocaleString()}`;
 }
 
-const WHATSAPP_NUMBER = "2349046004543";
-const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
-
 export const Route = createFileRoute("/oasis")({
   head: () => ({
     meta: [
@@ -407,9 +404,9 @@ function BookingSection({ treatments }: { treatments: Treatment[] }) {
           </p>
           <dl className="mt-10 space-y-5 text-sm">
             <div>
-              <dt className="eyebrow text-muted-foreground">Call/WhatsApp</dt>
+              <dt className="eyebrow text-muted-foreground">Call</dt>
               <dd className="mt-2 font-serif text-xl text-foreground">
-                <a href={WHATSAPP_LINK} className="transition-colors hover:text-accent">
+                <a href="tel:+2349130123123" className="transition-colors hover:text-accent">
                   09130123123
                 </a>
               </dd>

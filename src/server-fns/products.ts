@@ -10,6 +10,7 @@ export type Product = {
   size: string | null;
   description: string;
   price: number;
+  compareAtPrice: number | null;
   tag: "Best Seller" | "New" | "Signature";
   imageUrl: string | null;
   galleryUrls: string[];
@@ -25,6 +26,7 @@ type ProductRow = {
   size: string | null;
   description: string;
   price: number;
+  compare_at_price: number | null;
   tag: string;
   image_url: string | null;
   gallery_urls: string[];
@@ -41,6 +43,7 @@ function fromRow(row: ProductRow): Product {
     size: row.size,
     description: row.description,
     price: row.price,
+    compareAtPrice: row.compare_at_price,
     tag: row.tag as Product["tag"],
     imageUrl: row.image_url,
     galleryUrls: row.gallery_urls ?? [],
@@ -56,6 +59,7 @@ const productInput = z.object({
   size: z.string().trim().min(1).optional(),
   description: z.string().default(""),
   price: z.number().int().nonnegative(),
+  compareAtPrice: z.number().int().nonnegative().nullable().optional(),
   tag: z.enum(["Best Seller", "New", "Signature"]).default("New"),
   imageUrl: z.string().url().optional(),
   galleryUrls: z.array(z.string().url()).default([]),
@@ -102,6 +106,7 @@ export const createProductFn = createServerFn({ method: "POST" })
         size: data.size ?? null,
         description: data.description,
         price: data.price,
+        compare_at_price: data.compareAtPrice ?? null,
         tag: data.tag,
         image_url: data.imageUrl ?? null,
         gallery_urls: data.galleryUrls,
@@ -121,14 +126,26 @@ export const updateProductFn = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireAdmin();
     const supabase = getSupabaseServerClient();
-    const { name, size, description, price, tag, imageUrl, galleryUrls, benefits, inStock, sortOrder } =
-      data.patch;
+    const {
+      name,
+      size,
+      description,
+      price,
+      compareAtPrice,
+      tag,
+      imageUrl,
+      galleryUrls,
+      benefits,
+      inStock,
+      sortOrder,
+    } = data.patch;
 
     const update: Record<string, unknown> = {};
     if (name !== undefined) update["name"] = name;
     if (size !== undefined) update["size"] = size;
     if (description !== undefined) update["description"] = description;
     if (price !== undefined) update["price"] = price;
+    if (compareAtPrice !== undefined) update["compare_at_price"] = compareAtPrice;
     if (tag !== undefined) update["tag"] = tag;
     if (imageUrl !== undefined) update["image_url"] = imageUrl;
     if (galleryUrls !== undefined) update["gallery_urls"] = galleryUrls;

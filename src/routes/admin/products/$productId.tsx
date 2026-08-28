@@ -32,6 +32,7 @@ function EditProduct() {
           size: product.size ?? "",
           description: product.description,
           price: String(product.price),
+          compareAtPrice: product.compareAtPrice != null ? String(product.compareAtPrice) : "",
           tag: product.tag,
           benefits: product.benefits.join("\n"),
           inStock: product.inStock,
