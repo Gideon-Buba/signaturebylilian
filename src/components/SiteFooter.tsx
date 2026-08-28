@@ -20,8 +20,8 @@ const columns = [
       { label: "Shop", to: "/skincare" as const },
       { label: "Orders", to: "/contact" as const },
       { label: "Shipping", to: "/contact" as const },
-      { label: "Returns", to: "/contact" as const },
-      { label: "FAQs", to: "/contact" as const },
+      { label: "Returns", to: "/returns" as const },
+      { label: "FAQs", to: "/faq" as const },
     ],
   },
 ];
