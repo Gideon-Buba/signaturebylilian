@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Copy, MessageCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Reveal } from "@/components/Reveal";
@@ -8,7 +8,7 @@ import { useCart } from "@/lib/cart";
 import { copyToClipboard } from "@/lib/clipboard";
 import { NIGERIAN_STATES } from "@/lib/nigeria-states";
 import { createOrderFn } from "@/server-fns/orders";
-import { verifyPaymentFn } from "@/server-fns/payments";
+import { initializePaymentFn } from "@/server-fns/payments";
 
 const title = "Checkout — Signature by Lilian";
 
@@ -16,45 +16,6 @@ export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title }] }),
   component: CheckoutPage,
 });
-
-const PAYSTACK_SCRIPT_SRC = "https://js.paystack.co/v1/inline.js";
-const PAYSTACK_PUBLIC_KEY = import.meta.env["VITE_PAYSTACK_PUBLIC_KEY"] as string | undefined;
-
-declare global {
-  interface Window {
-    PaystackPop?: {
-      setup: (options: {
-        key: string;
-        email: string;
-        amount: number;
-        currency: string;
-        ref: string;
-        onClose: () => void;
-        callback: (response: { reference: string }) => void;
-      }) => { openIframe: () => void };
-    };
-  }
-}
-
-function usePaystackScript() {
-  const [ready, setReady] = useState(typeof window !== "undefined" && Boolean(window.PaystackPop));
-
-  useEffect(() => {
-    if (ready || typeof document === "undefined") return;
-    const existing = document.querySelector(`script[src="${PAYSTACK_SCRIPT_SRC}"]`);
-    if (existing) {
-      existing.addEventListener("load", () => setReady(true));
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = PAYSTACK_SCRIPT_SRC;
-    script.async = true;
-    script.onload = () => setReady(true);
-    document.body.appendChild(script);
-  }, [ready]);
-
-  return ready;
-}
 
 type PendingOrder = { orderId: string; subtotal: number; email: string };
 
@@ -73,49 +34,25 @@ function CheckoutPage() {
   const [pendingOrder, setPendingOrder] = useState<PendingOrder | null>(null);
   const [showBankDetails, setShowBankDetails] = useState(false);
   const [completed, setCompleted] = useState(false);
-  const [paidOnline, setPaidOnline] = useState(false);
-  const [verifying, setVerifying] = useState(false);
-  const paystackReady = usePaystackScript();
+  const [starting, setStarting] = useState(false);
 
-  const payWithPaystack = () => {
+  // Hands the customer to Echezona's hosted checkout. They come back to
+  // /checkout/callback, which confirms the payment server-side.
+  const payOnline = async () => {
     if (!pendingOrder) return;
-    if (!PAYSTACK_PUBLIC_KEY) {
-      toast.error("Online payment isn't configured yet", {
-        description: "Please choose to pay another way for now.",
+    setStarting(true);
+    try {
+      const { paymentUrl } = await initializePaymentFn({
+        data: { orderId: pendingOrder.orderId, origin: window.location.origin },
       });
-      return;
+      window.location.assign(paymentUrl);
+    } catch (error) {
+      setStarting(false);
+      toast.error("Couldn't start online payment", {
+        description:
+          error instanceof Error ? error.message : "Please try again or pay another way.",
+      });
     }
-    if (!paystackReady || !window.PaystackPop) {
-      toast.error("Payment is still loading, please try again in a moment.");
-      return;
-    }
-
-    const handler = window.PaystackPop.setup({
-      key: PAYSTACK_PUBLIC_KEY,
-      email: pendingOrder.email,
-      amount: Math.round(pendingOrder.subtotal * 100),
-      currency: "NGN",
-      ref: pendingOrder.orderId,
-      onClose: () => {
-        toast("Payment window closed", { description: "You can try again whenever you're ready." });
-      },
-      callback: (response) => {
-        setVerifying(true);
-        verifyPaymentFn({ data: { orderId: pendingOrder.orderId, reference: response.reference } })
-          .then(() => {
-            clear();
-            setPaidOnline(true);
-            setCompleted(true);
-          })
-          .catch((error: unknown) => {
-            toast.error("Couldn't confirm payment", {
-              description: error instanceof Error ? error.message : "Please contact us to confirm.",
-            });
-          })
-          .finally(() => setVerifying(false));
-      },
-    });
-    handler.openIframe();
   };
 
   if (pendingOrder) {
@@ -125,13 +62,11 @@ function CheckoutPage() {
         <Reveal>
           <p className="eyebrow text-magenta">Order Received</p>
           <h1 className="mt-4 font-serif text-4xl text-foreground lg:text-5xl">
-            {completed ? (paidOnline ? "Payment received" : "Thank you") : "Complete your payment"}
+            {completed ? "Thank you" : "Complete your payment"}
           </h1>
           <p className="mx-auto mt-4 max-w-md text-muted-foreground">
             {completed
-              ? paidOnline
-                ? "Thank you — your payment was successful and your order is confirmed. We'll reach out to arrange delivery."
-                : "Your order has been received. We'll confirm your transfer and reach out on the phone number you provided."
+              ? "Your order has been received. We'll confirm your transfer and reach out on the phone number you provided."
               : "Your order is saved. Pay securely online now, or choose to arrange payment with us directly."}
           </p>
           <div className="mt-2 flex items-center justify-center gap-2">
@@ -223,11 +158,11 @@ function CheckoutPage() {
             <div className="mt-9 flex flex-col items-center gap-3">
               <button
                 type="button"
-                onClick={payWithPaystack}
-                disabled={verifying}
+                onClick={payOnline}
+                disabled={starting}
                 className="eyebrow block w-full max-w-xs bg-plum px-8 py-4 text-center text-primary-foreground transition-colors hover:bg-magenta disabled:opacity-60 sm:w-auto"
               >
-                {verifying ? "Confirming Payment…" : "Pay Now with Paystack"}
+                {starting ? "Redirecting…" : "Pay Online"}
               </button>
               <button
                 type="button"
@@ -397,8 +332,8 @@ function CheckoutPage() {
               </span>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              You'll be able to pay securely online with Paystack on the next step, or arrange
-              payment with us directly.
+              You'll be able to pay securely online (card or bank transfer) on the next step, or
+              arrange payment with us directly.
             </p>
             <button
               type="submit"

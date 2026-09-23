@@ -9,7 +9,7 @@ import dotenv from "dotenv";
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 // The wrapper config above only injects VITE_-prefixed vars into
-// import.meta.env. Server-only secrets (Paystack, Supabase service role) are
+// import.meta.env. Server-only secrets (Echezona, Supabase service role) are
 // read via process.env in server functions, which Vite dev doesn't populate
 // from .env.local on its own — so load it here explicitly.
 dotenv.config({ path: ".env.local" });

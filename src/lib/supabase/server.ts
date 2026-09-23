@@ -38,7 +38,7 @@ export function getSupabaseServerClient() {
 
 // Privileged client that bypasses Row Level Security entirely. Only use this
 // for operations that have already been independently verified server-side
-// (e.g. confirming a payment with Paystack before marking an order paid) —
+// (e.g. confirming a payment with Echezona before marking an order paid) —
 // never in response to unverified client input.
 export function getSupabaseAdminClient() {
   const serviceRoleKey = process.env["SUPABASE_SERVICE_ROLE_KEY"];
