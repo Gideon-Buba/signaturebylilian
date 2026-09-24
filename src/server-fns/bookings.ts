@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { requireAdmin } from "@/lib/auth/session";
 import { sendEmail } from "@/lib/email";
+import { bookingToIcs } from "@/lib/ics";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 const BOOKING_NOTIFICATION_EMAIL = "bookings@signaturebylilian.com";
@@ -64,9 +65,49 @@ const createBookingInput = z.object({
   notes: z.string().trim().default(""),
 });
 
-function bookingNotificationHtml(data: z.infer<typeof createBookingInput>) {
+type BookingInput = z.infer<typeof createBookingInput>;
+
+// Customer-supplied text goes into these emails, so it's escaped first.
+function esc(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function prettyDate(date: string) {
+  const [y, m, d] = date.split("-").map(Number);
+  if (!y || !m || !d) return date;
+  return new Date(y, m - 1, d).toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function prettyTime(time: string) {
+  const [h, m] = time.split(":").map(Number);
+  if (h === undefined || m === undefined || Number.isNaN(h) || Number.isNaN(m)) return time;
+  return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "am" : "pm"}`;
+}
+
+function detailRows(data: BookingInput) {
   const row = (label: string, value: string) =>
-    `<tr><td style="padding:4px 12px 4px 0;color:#666;white-space:nowrap;">${label}</td><td style="padding:4px 0;"><strong>${value}</strong></td></tr>`;
+    `<tr><td style="padding:4px 16px 4px 0;color:#777;white-space:nowrap;vertical-align:top;">${label}</td><td style="padding:4px 0;"><strong>${esc(value)}</strong></td></tr>`;
+
+  return [
+    row("Treatment", data.treatmentName),
+    data.preferredDate ? row("Preferred date", prettyDate(data.preferredDate)) : "",
+    data.preferredTime ? row("Preferred time", prettyTime(data.preferredTime)) : "",
+    data.notes ? row("Notes", data.notes) : "",
+  ].join("");
+}
+
+function bookingNotificationHtml(data: BookingInput) {
+  const row = (label: string, value: string) =>
+    `<tr><td style="padding:4px 16px 4px 0;color:#777;white-space:nowrap;">${label}</td><td style="padding:4px 0;"><strong>${esc(value)}</strong></td></tr>`;
 
   return `
     <div style="font-family:sans-serif;font-size:15px;color:#222;">
@@ -75,14 +116,29 @@ function bookingNotificationHtml(data: z.infer<typeof createBookingInput>) {
         ${row("Name", data.customerName)}
         ${row("Phone", data.phone)}
         ${data.email ? row("Email", data.email) : ""}
-        ${row("Treatment", data.treatmentName)}
-        ${data.preferredDate ? row("Preferred date", data.preferredDate) : ""}
-        ${data.preferredTime ? row("Preferred time", data.preferredTime) : ""}
-        ${data.notes ? row("Notes", data.notes) : ""}
+        ${detailRows(data)}
       </table>
       <p style="margin-top:16px;">
-        <a href="https://signaturebylilian.com/admin/bookings">View in the admin dashboard</a>
+        <a href="https://signaturebylilian.com/admin/bookings">View in the admin calendar</a>
       </p>
+      ${data.preferredDate ? '<p style="color:#777;font-size:13px;">The attached invite adds this request to your calendar.</p>' : ""}
+    </div>
+  `;
+}
+
+function bookingAcknowledgementHtml(data: BookingInput) {
+  return `
+    <div style="font-family:Georgia,serif;font-size:16px;color:#222;max-width:560px;">
+      <p style="letter-spacing:0.2em;text-transform:uppercase;font-size:12px;color:#a0247a;">Signature by Lilian Oasis</p>
+      <h2 style="font-weight:normal;font-size:26px;margin:8px 0 16px;">We've received your request</h2>
+      <p>Hi ${esc(data.customerName)},</p>
+      <p>Thank you for booking with us. Your appointment request is in, and we'll confirm it personally within a few hours.</p>
+      <table cellpadding="0" cellspacing="0" style="font-family:sans-serif;font-size:15px;margin:16px 0;">
+        ${detailRows(data)}
+      </table>
+      <p>This isn't a confirmed booking yet. You'll hear from us on <strong>${esc(data.phone)}</strong> to confirm the time. If you need to change anything, just reply to this email or message us on WhatsApp at 09046004543.</p>
+      <p style="margin-top:24px;">Warmly,<br />Signature by Lilian Oasis</p>
+      <p style="color:#777;font-size:13px;margin-top:24px;">Mon to Sat, 9:00 am to 6:00 pm · No 2 Omako Street, Off No 3 Stephen Ocheni Street, Wuye, Abuja</p>
     </div>
   `;
 }
@@ -91,7 +147,13 @@ export const createBookingFn = createServerFn({ method: "POST" })
   .validator(createBookingInput)
   .handler(async ({ data }) => {
     const supabase = getSupabaseServerClient();
+
+    // Guests can INSERT but not SELECT, so the id is generated here (the
+    // calendar invite needs a stable one too).
+    const bookingId = crypto.randomUUID();
+
     const { error } = await supabase.from("bookings").insert({
+      id: bookingId,
       customer_name: data.customerName,
       phone: data.phone,
       email: data.email ? data.email : null,
@@ -104,16 +166,51 @@ export const createBookingFn = createServerFn({ method: "POST" })
 
     if (error) throw new Error(error.message);
 
-    // Notification only — a failed email must never fail the booking itself.
-    try {
-      await sendEmail({
-        to: BOOKING_NOTIFICATION_EMAIL,
-        subject: `New booking: ${data.customerName} — ${data.treatmentName}`,
-        html: bookingNotificationHtml(data),
-      });
-    } catch (emailError) {
-      console.error("Failed to send booking notification email:", emailError);
-    }
+    // Emails are notifications only: a failure of either must never fail the
+    // booking itself, and one failing must not stop the other.
+    const send = async (label: string, job: () => Promise<void>) => {
+      try {
+        await job();
+      } catch (emailError) {
+        console.error(`Failed to send ${label} email:`, emailError);
+      }
+    };
+
+    await Promise.all([
+      send("booking notification", () =>
+        sendEmail({
+          to: BOOKING_NOTIFICATION_EMAIL,
+          subject: `New booking: ${data.customerName}, ${data.treatmentName}`,
+          html: bookingNotificationHtml(data),
+          ...(data.email && { replyTo: data.email }),
+          ...(data.preferredDate && {
+            attachments: [
+              {
+                filename: "booking.ics",
+                contentType: "text/calendar; charset=utf-8; method=PUBLISH",
+                content: bookingToIcs({
+                  uid: bookingId,
+                  date: data.preferredDate,
+                  time: data.preferredTime || null,
+                  summary: `${data.treatmentName}: ${data.customerName} (requested)`,
+                  description: `Phone: ${data.phone}${data.email ? `\nEmail: ${data.email}` : ""}${data.notes ? `\nNotes: ${data.notes}` : ""}`,
+                }),
+              },
+            ],
+          }),
+        }),
+      ),
+      data.email
+        ? send("booking acknowledgement", () =>
+            sendEmail({
+              to: data.email as string,
+              subject: "We've received your appointment request",
+              html: bookingAcknowledgementHtml(data),
+              replyTo: BOOKING_NOTIFICATION_EMAIL,
+            }),
+          )
+        : Promise.resolve(),
+    ]);
 
     return { success: true as const };
   });
