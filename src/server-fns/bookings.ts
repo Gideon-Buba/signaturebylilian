@@ -137,6 +137,7 @@ function bookingAcknowledgementHtml(data: BookingInput) {
         ${detailRows(data)}
       </table>
       <p>This isn't a confirmed booking yet. We'll call or WhatsApp you on the number you gave us to confirm the time. If you need to change anything before then, just reply to this email or <a href="https://wa.me/2349046004543">message us on WhatsApp</a>.</p>
+      ${data.preferredDate ? '<p style="color:#777;font-size:13px;">We\'ve attached a calendar invite for the time you requested — open it to add this to your own calendar.</p>' : ""}
       <p style="margin-top:24px;">Warmly,<br />Signature by Lilian Oasis</p>
       <p style="color:#777;font-size:13px;margin-top:24px;">Mon to Sat, 9:00 am to 6:00 pm · No 2 Omako Street, Off No 3 Stephen Ocheni Street, Wuye, Abuja</p>
     </div>
@@ -166,6 +167,24 @@ export const createBookingFn = createServerFn({ method: "POST" })
 
     if (error) throw new Error(error.message);
 
+    // Built once and attached to both emails, so the customer can add the
+    // appointment to their own calendar too, not just the admin inbox.
+    const icsAttachment = data.preferredDate
+      ? [
+          {
+            filename: "booking.ics",
+            contentType: "text/calendar; charset=utf-8; method=PUBLISH",
+            content: bookingToIcs({
+              uid: bookingId,
+              date: data.preferredDate,
+              time: data.preferredTime || null,
+              summary: `${data.treatmentName}: ${data.customerName} (requested)`,
+              description: `Phone: ${data.phone}${data.email ? `\nEmail: ${data.email}` : ""}${data.notes ? `\nNotes: ${data.notes}` : ""}`,
+            }),
+          },
+        ]
+      : undefined;
+
     // Emails are notifications only: a failure of either must never fail the
     // booking itself, and one failing must not stop the other.
     const send = async (label: string, job: () => Promise<void>) => {
@@ -183,21 +202,7 @@ export const createBookingFn = createServerFn({ method: "POST" })
           subject: `New booking: ${data.customerName}, ${data.treatmentName}`,
           html: bookingNotificationHtml(data),
           ...(data.email && { replyTo: data.email }),
-          ...(data.preferredDate && {
-            attachments: [
-              {
-                filename: "booking.ics",
-                contentType: "text/calendar; charset=utf-8; method=PUBLISH",
-                content: bookingToIcs({
-                  uid: bookingId,
-                  date: data.preferredDate,
-                  time: data.preferredTime || null,
-                  summary: `${data.treatmentName}: ${data.customerName} (requested)`,
-                  description: `Phone: ${data.phone}${data.email ? `\nEmail: ${data.email}` : ""}${data.notes ? `\nNotes: ${data.notes}` : ""}`,
-                }),
-              },
-            ],
-          }),
+          ...(icsAttachment && { attachments: icsAttachment }),
         }),
       ),
       data.email
@@ -207,6 +212,7 @@ export const createBookingFn = createServerFn({ method: "POST" })
               subject: "We've received your appointment request",
               html: bookingAcknowledgementHtml(data),
               replyTo: BOOKING_NOTIFICATION_EMAIL,
+              ...(icsAttachment && { attachments: icsAttachment }),
             }),
           )
         : Promise.resolve(),
