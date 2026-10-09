@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { AdminShell } from "@/components/admin/AdminShell";
+import { BookingsCalendar } from "@/components/admin/BookingsCalendar";
 import { requireAdminForRoute } from "@/lib/auth/routeGuard";
 import { listBookingsFn, updateBookingStatusFn, type BookingStatus } from "@/server-fns/bookings";
 
@@ -21,6 +23,7 @@ const STATUSES: BookingStatus[] = ["pending", "confirmed", "completed", "cancell
 function BookingsList() {
   const { user } = Route.useRouteContext();
   const queryClient = useQueryClient();
+  const [view, setView] = useState<"calendar" | "list">("calendar");
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: BOOKINGS_QUERY_KEY,
@@ -28,7 +31,8 @@ function BookingsList() {
   });
 
   const statusMutation = useMutation({
-    mutationFn: (vars: { id: string; status: BookingStatus }) => updateBookingStatusFn({ data: vars }),
+    mutationFn: (vars: { id: string; status: BookingStatus }) =>
+      updateBookingStatusFn({ data: vars }),
     onSuccess: () => {
       toast.success("Booking updated");
       queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEY });
@@ -37,14 +41,45 @@ function BookingsList() {
   });
 
   return (
-    <AdminShell user={user} title="Bookings">
+    <AdminShell
+      user={user}
+      title="Bookings"
+      actions={
+        <div className="flex border border-border">
+          {(["calendar", "list"] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => setView(v)}
+              className={`px-4 py-2 text-xs capitalize transition-colors ${
+                view === v
+                  ? "bg-accent/10 text-accent"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {v}
+            </button>
+          ))}
+        </div>
+      }
+    >
       {isLoading && <p className="mt-8 text-sm text-muted-foreground">Loading…</p>}
 
       {!isLoading && (bookings ?? []).length === 0 && (
         <p className="mt-8 text-sm text-muted-foreground">No appointment requests yet.</p>
       )}
 
-      {!isLoading && (bookings ?? []).length > 0 && (
+      {!isLoading && view === "calendar" && (bookings ?? []).length > 0 && (
+        <div className="mt-6">
+          <BookingsCalendar
+            bookings={bookings ?? []}
+            busy={statusMutation.isPending}
+            onStatusChange={(id, status) => statusMutation.mutate({ id, status })}
+          />
+        </div>
+      )}
+
+      {!isLoading && view === "list" && (bookings ?? []).length > 0 && (
         <div className="mt-6 overflow-x-auto">
           <table className="w-full min-w-[880px] border-collapse text-left text-sm">
             <thead>

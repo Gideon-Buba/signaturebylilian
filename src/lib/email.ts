@@ -1,15 +1,25 @@
 import nodemailer from "nodemailer";
 
+export type EmailAttachment = {
+  filename: string;
+  content: string;
+  contentType: string;
+};
+
 // Sends through Google Workspace's SMTP (smtp.gmail.com), using a Workspace
 // mailbox + App Password. Server-only: never import this from client code.
 export async function sendEmail({
   to,
   subject,
   html,
+  replyTo,
+  attachments,
 }: {
   to: string;
   subject: string;
   html: string;
+  replyTo?: string;
+  attachments?: EmailAttachment[];
 }) {
   const user = process.env["SMTP_USER"];
   const pass = process.env["SMTP_PASS"];
@@ -29,5 +39,7 @@ export async function sendEmail({
     to,
     subject,
     html,
+    ...(replyTo && { replyTo }),
+    ...(attachments && { attachments }),
   });
 }

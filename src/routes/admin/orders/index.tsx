@@ -311,7 +311,7 @@ function OrdersList() {
                                     </dd>
                                   </div>
                                   <div className="flex justify-between gap-4">
-                                    <dt className="text-muted-foreground">Paystack ref</dt>
+                                    <dt className="text-muted-foreground">Payment ref</dt>
                                     <dd className="font-mono break-all text-foreground">
                                       {order.paymentReference ?? "—"}
                                     </dd>

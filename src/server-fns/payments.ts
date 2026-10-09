@@ -1,76 +1,77 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import {
+  confirmOrderPayment,
+  ECHEZONA_BASE_URL,
+  getApiKey,
+  isLive,
+  type EchezonaInitializeResponse,
+} from "@/lib/echezona.server";
 import { getSupabaseAdminClient } from "@/lib/supabase/server";
 
-type PaystackVerifyResponse = {
-  status: boolean;
-  message: string;
-  data?: {
-    status: "success" | "failed" | "abandoned";
-    reference: string;
-    amount: number;
-    currency: string;
-  };
-};
-
-export const verifyPaymentFn = createServerFn({ method: "POST" })
-  .validator(z.object({ orderId: z.string().uuid(), reference: z.string().min(1) }))
+// Creates the hosted-checkout payment and returns the URL to send the customer to.
+export const initializePaymentFn = createServerFn({ method: "POST" })
+  .validator(z.object({ orderId: z.string().uuid(), origin: z.string().url() }))
   .handler(async ({ data }) => {
-    const secretKey = process.env["PAYSTACK_SECRET_KEY"];
-    if (!secretKey) {
-      throw new Error(
-        "Payments aren't configured on the server yet — PAYSTACK_SECRET_KEY is missing.",
-      );
-    }
+    const apiKey = getApiKey();
 
-    // Guest customers can't SELECT their own order back (RLS restricts reads
-    // to admins) — this read is server-only and just cross-checks the
-    // subtotal against what Paystack verified, so the admin client is safe
-    // to use here too.
     const admin = getSupabaseAdminClient();
     const { data: order, error: orderError } = await admin
       .from("orders")
-      .select("id, subtotal, payment_status")
+      .select("id, customer_name, phone, email, subtotal, payment_status")
       .eq("id", data.orderId)
       .single();
 
     if (orderError) throw new Error("Order not found");
-    if (order.payment_status === "paid") return { success: true as const };
+    if (order.payment_status === "paid") throw new Error("This order has already been paid");
 
-    const verifyRes = await fetch(
-      `https://api.paystack.co/transaction/verify/${encodeURIComponent(data.reference)}`,
-      { headers: { Authorization: `Bearer ${secretKey}` } },
-    );
-    const verify = (await verifyRes.json()) as PaystackVerifyResponse;
+    // Echezona rejects requests without both names (despite the docs marking
+    // them optional), so single-word names get a placeholder last name.
+    const [firstName = "Customer", ...rest] = String(order.customer_name).trim().split(/\s+/);
 
-    if (!verifyRes.ok || !verify.status || !verify.data) {
-      throw new Error(verify.message || "Couldn't verify payment with Paystack");
+    const res = await fetch(`${ECHEZONA_BASE_URL}/Payments/Initialize`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        isLive: isLive(),
+        amount: String(order.subtotal),
+        currency: "NGN",
+        email:
+          order.email ||
+          `${String(order.phone).replace(/\D/g, "") || "guest"}@guest.signaturebylilian.com`,
+        phone: order.phone,
+        firstName,
+        lastName: rest.join(" ") || "-",
+        transactionId: order.id,
+        callbackUrl: `${data.origin}/checkout/callback?order=${order.id}`,
+        metadata: [
+          { name: "OrderId", value: order.id },
+          { name: "CustomerName", value: order.customer_name },
+        ],
+      }),
+    });
+    const raw = await res.text();
+    let body: EchezonaInitializeResponse | null = null;
+    try {
+      body = JSON.parse(raw) as EchezonaInitializeResponse;
+    } catch {
+      // Non-JSON errors (e.g. "Invalid merchant key") come back as plain text.
     }
 
-    const { status, amount, currency } = verify.data;
-    const expectedAmountKobo = Math.round(order.subtotal * 100);
-
-    if (status !== "success") {
-      throw new Error(`Payment was not successful (status: ${status})`);
+    if (!res.ok || !body || body.responseCode !== "00" || !body.data?.paymentUrl) {
+      console.error("Echezona initialize failed:", res.status, raw);
+      throw new Error(
+        body?.responseMessage ||
+          (res.status === 401
+            ? "Online payment isn't set up correctly yet — the Echezona API key was rejected."
+            : "Couldn't start the payment with Echezona"),
+      );
     }
-    if (currency !== "NGN" || amount !== expectedAmountKobo) {
-      throw new Error("Payment amount doesn't match the order total");
-    }
 
-    // RLS restricts order updates to admins — this write is only reachable
-    // after the Paystack verification above has independently confirmed the
-    // payment, so bypassing RLS here (via the service-role client) is safe.
-    const { error: updateError } = await admin
-      .from("orders")
-      .update({
-        payment_status: "paid",
-        payment_reference: data.reference,
-        status: "confirmed",
-      })
-      .eq("id", data.orderId);
-
-    if (updateError) throw new Error(updateError.message);
-
-    return { success: true as const };
+    return { paymentUrl: body.data.paymentUrl };
   });
+
+export const verifyPaymentFn = createServerFn({ method: "POST" })
+  .validator(z.object({ orderId: z.string().uuid() }))
+  .handler(async ({ data }) => confirmOrderPayment(data.orderId));

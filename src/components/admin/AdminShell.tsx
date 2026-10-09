@@ -62,7 +62,7 @@ export function AdminShell({
   return (
     <div className="min-h-screen bg-background lg:flex">
       {/* Desktop sidebar */}
-      <aside className="hidden w-64 shrink-0 border-r border-border lg:flex lg:flex-col">
+      <aside className="hidden w-64 shrink-0 border-r border-border lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:self-start">
         <Link to="/admin" className="flex items-center gap-2.5 border-b border-border px-6 py-5">
           <img src={skincareLogo} alt="" className="h-9 w-auto" />
           <span className="eyebrow text-accent">Admin</span>
