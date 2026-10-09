@@ -6,6 +6,7 @@ import {
   Newspaper,
   Package,
   ReceiptText,
+  Settings,
   Sparkles,
   X,
 } from "lucide-react";
@@ -21,6 +22,7 @@ const adminNav = [
   { to: "/admin/bookings", label: "Bookings", icon: CalendarClock },
   { to: "/admin/orders", label: "Orders", icon: ReceiptText },
   { to: "/admin/journal", label: "Journal", icon: Newspaper },
+  { to: "/admin/settings", label: "Settings", icon: Settings },
 ] as const;
 
 export function AdminShell({
@@ -47,7 +49,9 @@ export function AdminShell({
             to={item.to}
             activeOptions={{ exact: item.to === "/admin" }}
             activeProps={{ className: "bg-accent/10 text-accent" }}
-            inactiveProps={{ className: "text-muted-foreground hover:bg-secondary/60 hover:text-foreground" }}
+            inactiveProps={{
+              className: "text-muted-foreground hover:bg-secondary/60 hover:text-foreground",
+            }}
             onClick={() => setMobileNavOpen(false)}
             className="flex items-center gap-3 px-4 py-2.5 text-sm transition-colors"
           >
