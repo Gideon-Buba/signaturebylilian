@@ -9,11 +9,13 @@ import { copyToClipboard } from "@/lib/clipboard";
 import { NIGERIAN_STATES } from "@/lib/nigeria-states";
 import { createOrderFn } from "@/server-fns/orders";
 import { initializePaymentFn } from "@/server-fns/payments";
+import { getSiteSettingsFn, type SiteSettings } from "@/server-fns/settings";
 
 const title = "Checkout — Signature by Lilian";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title }] }),
+  loader: () => getSiteSettingsFn(),
   component: CheckoutPage,
 });
 
@@ -29,10 +31,13 @@ const BANK_DETAILS = {
 const WHATSAPP_LINK = "https://wa.me/2349046004543";
 
 function CheckoutPage() {
+  const settings = Route.useLoaderData() as SiteSettings;
   const { items, subtotal, clear } = useCart();
   const [submitting, setSubmitting] = useState(false);
   const [pendingOrder, setPendingOrder] = useState<PendingOrder | null>(null);
-  const [showBankDetails, setShowBankDetails] = useState(false);
+  // If online payment is off, skip straight to the bank-details panel —
+  // there's nothing else to choose between.
+  const [showBankDetails, setShowBankDetails] = useState(!settings.payOnlineEnabled);
   const [completed, setCompleted] = useState(false);
   const [starting, setStarting] = useState(false);
 
@@ -67,7 +72,11 @@ function CheckoutPage() {
           <p className="mx-auto mt-4 max-w-md text-muted-foreground">
             {completed
               ? "Your order has been received. We'll confirm your transfer and reach out on the phone number you provided."
-              : "Your order is saved. Pay securely online now, or choose to arrange payment with us directly."}
+              : settings.payOnlineEnabled && settings.bankTransferEnabled
+                ? "Your order is saved. Pay securely online now, or choose to arrange payment with us directly."
+                : settings.payOnlineEnabled
+                  ? "Your order is saved. Pay securely online now to confirm it."
+                  : "Your order is saved. Arrange payment with us directly to confirm it."}
           </p>
           <div className="mt-2 flex items-center justify-center gap-2">
             <p className="text-xs tracking-[0.18em] text-muted-foreground uppercase">
@@ -156,21 +165,25 @@ function CheckoutPage() {
             </div>
           ) : (
             <div className="mt-9 flex flex-col items-center gap-3">
-              <button
-                type="button"
-                onClick={payOnline}
-                disabled={starting}
-                className="eyebrow block w-full max-w-xs bg-plum px-8 py-4 text-center text-primary-foreground transition-colors hover:bg-magenta disabled:opacity-60 sm:w-auto"
-              >
-                {starting ? "Redirecting…" : "Pay Online"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowBankDetails(true)}
-                className="eyebrow text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-              >
-                I'll arrange payment another way
-              </button>
+              {settings.payOnlineEnabled && (
+                <button
+                  type="button"
+                  onClick={payOnline}
+                  disabled={starting}
+                  className="eyebrow block w-full max-w-xs bg-plum px-8 py-4 text-center text-primary-foreground transition-colors hover:bg-magenta disabled:opacity-60 sm:w-auto"
+                >
+                  {starting ? "Redirecting…" : "Pay Online"}
+                </button>
+              )}
+              {settings.bankTransferEnabled && (
+                <button
+                  type="button"
+                  onClick={() => setShowBankDetails(true)}
+                  className="eyebrow text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                >
+                  I'll arrange payment another way
+                </button>
+              )}
             </div>
           )}
         </Reveal>
@@ -332,8 +345,11 @@ function CheckoutPage() {
               </span>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              You'll be able to pay securely online (card or bank transfer) on the next step, or
-              arrange payment with us directly.
+              {settings.payOnlineEnabled && settings.bankTransferEnabled
+                ? "You'll be able to pay securely online (card or bank transfer) on the next step, or arrange payment with us directly."
+                : settings.payOnlineEnabled
+                  ? "You'll be able to pay securely online (card or bank transfer) on the next step."
+                  : "You'll arrange payment with us directly on the next step."}
             </p>
             <button
               type="submit"

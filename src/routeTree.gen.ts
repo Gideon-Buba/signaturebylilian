@@ -33,6 +33,7 @@ import { Route as AdminOrdersIndexRouteImport } from './routes/admin/orders/inde
 import { Route as AdminProductsIndexRouteImport } from './routes/admin/products/index'
 import { Route as AdminProductsProductIdRouteImport } from './routes/admin/products/$productId'
 import { Route as AdminProductsNewRouteImport } from './routes/admin/products/new'
+import { Route as AdminSettingsIndexRouteImport } from './routes/admin/settings/index'
 import { Route as AdminTreatmentsIndexRouteImport } from './routes/admin/treatments/index'
 import { Route as AdminTreatmentsTreatmentIdRouteImport } from './routes/admin/treatments/$treatmentId'
 import { Route as AdminTreatmentsNewRouteImport } from './routes/admin/treatments/new'
@@ -157,6 +158,11 @@ const AdminProductsNewRoute = AdminProductsNewRouteImport.update({
   path: '/admin/products/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSettingsIndexRoute = AdminSettingsIndexRouteImport.update({
+  id: '/admin/settings/',
+  path: '/admin/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminTreatmentsIndexRoute = AdminTreatmentsIndexRouteImport.update({
   id: '/admin/treatments/',
   path: '/admin/treatments/',
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/admin/journal/': typeof AdminJournalIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/admin/settings/': typeof AdminSettingsIndexRoute
   '/admin/treatments/': typeof AdminTreatmentsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/admin/journal': typeof AdminJournalIndexRoute
   '/admin/orders': typeof AdminOrdersIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
+  '/admin/settings': typeof AdminSettingsIndexRoute
   '/admin/treatments': typeof AdminTreatmentsIndexRoute
 }
 export interface FileRoutesById {
@@ -260,6 +268,7 @@ export interface FileRoutesById {
   '/admin/journal/': typeof AdminJournalIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/admin/settings/': typeof AdminSettingsIndexRoute
   '/admin/treatments/': typeof AdminTreatmentsIndexRoute
 }
 export interface FileRouteTypes {
@@ -291,6 +300,7 @@ export interface FileRouteTypes {
     | '/admin/journal/'
     | '/admin/orders/'
     | '/admin/products/'
+    | '/admin/settings/'
     | '/admin/treatments/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/admin/journal'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/settings'
     | '/admin/treatments'
   id:
     | '__root__'
@@ -349,6 +360,7 @@ export interface FileRouteTypes {
     | '/admin/journal/'
     | '/admin/orders/'
     | '/admin/products/'
+    | '/admin/settings/'
     | '/admin/treatments/'
   fileRoutesById: FileRoutesById
 }
@@ -378,6 +390,7 @@ export interface RootRouteChildren {
   AdminJournalIndexRoute: typeof AdminJournalIndexRoute
   AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
+  AdminSettingsIndexRoute: typeof AdminSettingsIndexRoute
   AdminTreatmentsIndexRoute: typeof AdminTreatmentsIndexRoute
 }
 
@@ -551,6 +564,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/settings/': {
+      id: '/admin/settings/'
+      path: '/admin/settings'
+      fullPath: '/admin/settings/'
+      preLoaderRoute: typeof AdminSettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/treatments/': {
       id: '/admin/treatments/'
       path: '/admin/treatments'
@@ -613,6 +633,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminJournalIndexRoute: AdminJournalIndexRoute,
   AdminOrdersIndexRoute: AdminOrdersIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
+  AdminSettingsIndexRoute: AdminSettingsIndexRoute,
   AdminTreatmentsIndexRoute: AdminTreatmentsIndexRoute,
 }
 export const routeTree = rootRouteImport
