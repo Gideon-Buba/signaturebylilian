@@ -136,7 +136,7 @@ function bookingAcknowledgementHtml(data: BookingInput) {
       <table cellpadding="0" cellspacing="0" style="font-family:sans-serif;font-size:15px;margin:16px 0;">
         ${detailRows(data)}
       </table>
-      <p>This isn't a confirmed booking yet. You'll hear from us on <strong>${esc(data.phone)}</strong> to confirm the time. If you need to change anything, just reply to this email or message us on WhatsApp at 09046004543.</p>
+      <p>This isn't a confirmed booking yet. We'll call or WhatsApp you on the number you gave us to confirm the time. If you need to change anything before then, just reply to this email or <a href="https://wa.me/2349046004543">message us on WhatsApp</a>.</p>
       <p style="margin-top:24px;">Warmly,<br />Signature by Lilian Oasis</p>
       <p style="color:#777;font-size:13px;margin-top:24px;">Mon to Sat, 9:00 am to 6:00 pm · No 2 Omako Street, Off No 3 Stephen Ocheni Street, Wuye, Abuja</p>
     </div>
