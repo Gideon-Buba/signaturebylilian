@@ -13,7 +13,7 @@ import { getSiteSettingsFn, type SiteSettings } from "@/server-fns/settings";
 
 const title = "Checkout — Signature by Lilian";
 
-export const Route = createFileRoute("/checkout")({
+export const Route = createFileRoute("/checkout/")({
   head: () => ({ meta: [{ title }] }),
   loader: () => getSiteSettingsFn(),
   component: CheckoutPage,
