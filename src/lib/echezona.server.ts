@@ -36,10 +36,20 @@ export function isLive() {
   return process.env["ECHEZONA_IS_LIVE"] === "true";
 }
 
+// Echezona's transactionId field has a hard 30-character limit, so our UUID
+// order ids (36 chars, with dashes) can't be used directly — every Initialize
+// call was rejected with a validation error until this was added. Instead we
+// mint a short reference per payment attempt and store it on the order, so
+// Echezona only ever sees this, and we map back to the order by looking it
+// up again. 24 hex chars is well under the limit with plenty of entropy.
+export function generatePaymentReference() {
+  return crypto.randomUUID().replace(/-/g, "").slice(0, 24);
+}
+
 // Asks Echezona for the transaction's status and, only if it's genuinely paid
 // and covers the order total, marks the order paid. Shared by the browser
 // callback and the webhook — neither is trusted on its own, Echezona's own
-// answer is what counts. The order id is used as the transactionId.
+// answer is what counts.
 export async function confirmOrderPayment(orderId: string) {
   const apiKey = getApiKey();
 
@@ -48,17 +58,22 @@ export async function confirmOrderPayment(orderId: string) {
   const admin = getSupabaseAdminClient();
   const { data: order, error: orderError } = await admin
     .from("orders")
-    .select("id, subtotal, payment_status")
+    .select("id, subtotal, payment_status, payment_reference")
     .eq("id", orderId)
     .single();
 
   if (orderError) throw new Error("Order not found");
   if (order.payment_status === "paid") return { status: "paid" as const };
+  if (!order.payment_reference) {
+    // Online payment was never started for this order (e.g. it's a
+    // bank-transfer order) — nothing to verify with Echezona.
+    throw new Error("No online payment was started for this order");
+  }
 
   const verifyRes = await fetch(`${ECHEZONA_BASE_URL}/Payments/VerifyPayment`, {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ transactionId: orderId }),
+    body: JSON.stringify({ transactionId: order.payment_reference }),
   });
   const rawVerify = await verifyRes.text();
   let verify: EchezonaVerifyResponse | null = null;
@@ -85,14 +100,11 @@ export async function confirmOrderPayment(orderId: string) {
   }
 
   // RLS restricts order updates to admins — this write is only reachable after
-  // Echezona has independently confirmed the payment above.
+  // Echezona has independently confirmed the payment above. payment_reference
+  // is left as-is (it already holds our Echezona transactionId).
   const { error: updateError } = await admin
     .from("orders")
-    .update({
-      payment_status: "paid",
-      payment_reference: verify.data.paymentReference ?? orderId,
-      status: "confirmed",
-    })
+    .update({ payment_status: "paid", status: "confirmed" })
     .eq("id", orderId);
 
   if (updateError) throw new Error(updateError.message);
