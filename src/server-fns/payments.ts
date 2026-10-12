@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   confirmOrderPayment,
   ECHEZONA_BASE_URL,
+  generatePaymentReference,
   getApiKey,
   isLive,
   type EchezonaInitializeResponse,
@@ -30,6 +31,17 @@ export const initializePaymentFn = createServerFn({ method: "POST" })
     // them optional), so single-word names get a placeholder last name.
     const [firstName = "Customer", ...rest] = String(order.customer_name).trim().split(/\s+/);
 
+    // A fresh reference per attempt — overwrites any reference from an
+    // earlier abandoned attempt on this order. This is what we send Echezona
+    // as transactionId (our UUID order id is too long for that field) and
+    // how the webhook/callback map a payment back to this order afterwards.
+    const paymentReference = generatePaymentReference();
+    const { error: refError } = await admin
+      .from("orders")
+      .update({ payment_reference: paymentReference })
+      .eq("id", order.id);
+    if (refError) throw new Error(refError.message);
+
     const res = await fetch(`${ECHEZONA_BASE_URL}/Payments/Initialize`, {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -43,7 +55,7 @@ export const initializePaymentFn = createServerFn({ method: "POST" })
         phone: order.phone,
         firstName,
         lastName: rest.join(" ") || "-",
-        transactionId: order.id,
+        transactionId: paymentReference,
         callbackUrl: `${data.origin}/checkout/callback?order=${order.id}`,
         metadata: [
           { name: "OrderId", value: order.id },

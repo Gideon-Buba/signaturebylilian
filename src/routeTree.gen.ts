@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as CartRouteImport } from './routes/cart'
-import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as OasisRouteImport } from './routes/oasis'
@@ -20,7 +19,8 @@ import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as ApiEchezonaWebhookRouteImport } from './routes/api/echezona-webhook'
-import { Route as CheckoutCallbackRouteImport } from './routes/checkout.callback'
+import { Route as CheckoutIndexRouteImport } from './routes/checkout/index'
+import { Route as CheckoutCallbackRouteImport } from './routes/checkout/callback'
 import { Route as JournalIndexRouteImport } from './routes/journal/index'
 import { Route as JournalSlugRouteImport } from './routes/journal/$slug'
 import { Route as SkincareIndexRouteImport } from './routes/skincare/index'
@@ -51,11 +51,6 @@ const AboutRoute = AboutRouteImport.update({
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -93,10 +88,15 @@ const ApiEchezonaWebhookRoute = ApiEchezonaWebhookRouteImport.update({
   path: '/api/echezona-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutIndexRoute = CheckoutIndexRouteImport.update({
+  id: '/checkout/',
+  path: '/checkout/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutCallbackRoute = CheckoutCallbackRouteImport.update({
-  id: '/callback',
-  path: '/callback',
-  getParentRoute: () => CheckoutRoute,
+  id: '/checkout/callback',
+  path: '/checkout/callback',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const JournalIndexRoute = JournalIndexRouteImport.update({
   id: '/journal/',
@@ -184,7 +184,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/cart': typeof CartRoute
-  '/checkout': typeof CheckoutRouteWithChildren
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/oasis': typeof OasisRoute
@@ -195,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/journal/$slug': typeof JournalSlugRoute
   '/skincare/$productId': typeof SkincareProductIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/checkout/': typeof CheckoutIndexRoute
   '/journal/': typeof JournalIndexRoute
   '/skincare/': typeof SkincareIndexRoute
   '/admin/journal/$postId': typeof AdminJournalPostIdRoute
@@ -214,7 +214,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/cart': typeof CartRoute
-  '/checkout': typeof CheckoutRouteWithChildren
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/oasis': typeof OasisRoute
@@ -225,6 +224,7 @@ export interface FileRoutesByTo {
   '/journal/$slug': typeof JournalSlugRoute
   '/skincare/$productId': typeof SkincareProductIdRoute
   '/admin': typeof AdminIndexRoute
+  '/checkout': typeof CheckoutIndexRoute
   '/journal': typeof JournalIndexRoute
   '/skincare': typeof SkincareIndexRoute
   '/admin/journal/$postId': typeof AdminJournalPostIdRoute
@@ -245,7 +245,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/cart': typeof CartRoute
-  '/checkout': typeof CheckoutRouteWithChildren
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/oasis': typeof OasisRoute
@@ -256,6 +255,7 @@ export interface FileRoutesById {
   '/journal/$slug': typeof JournalSlugRoute
   '/skincare/$productId': typeof SkincareProductIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/checkout/': typeof CheckoutIndexRoute
   '/journal/': typeof JournalIndexRoute
   '/skincare/': typeof SkincareIndexRoute
   '/admin/journal/$postId': typeof AdminJournalPostIdRoute
@@ -277,7 +277,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/cart'
-    | '/checkout'
     | '/contact'
     | '/faq'
     | '/oasis'
@@ -288,6 +287,7 @@ export interface FileRouteTypes {
     | '/journal/$slug'
     | '/skincare/$productId'
     | '/admin/'
+    | '/checkout/'
     | '/journal/'
     | '/skincare/'
     | '/admin/journal/$postId'
@@ -307,7 +307,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/cart'
-    | '/checkout'
     | '/contact'
     | '/faq'
     | '/oasis'
@@ -318,6 +317,7 @@ export interface FileRouteTypes {
     | '/journal/$slug'
     | '/skincare/$productId'
     | '/admin'
+    | '/checkout'
     | '/journal'
     | '/skincare'
     | '/admin/journal/$postId'
@@ -337,7 +337,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/cart'
-    | '/checkout'
     | '/contact'
     | '/faq'
     | '/oasis'
@@ -348,6 +347,7 @@ export interface FileRouteTypes {
     | '/journal/$slug'
     | '/skincare/$productId'
     | '/admin/'
+    | '/checkout/'
     | '/journal/'
     | '/skincare/'
     | '/admin/journal/$postId'
@@ -368,16 +368,17 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   CartRoute: typeof CartRoute
-  CheckoutRoute: typeof CheckoutRouteWithChildren
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   OasisRoute: typeof OasisRoute
   ReturnsRoute: typeof ReturnsRoute
   AdminLoginRoute: typeof AdminLoginRoute
   ApiEchezonaWebhookRoute: typeof ApiEchezonaWebhookRoute
+  CheckoutCallbackRoute: typeof CheckoutCallbackRoute
   JournalSlugRoute: typeof JournalSlugRoute
   SkincareProductIdRoute: typeof SkincareProductIdRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  CheckoutIndexRoute: typeof CheckoutIndexRoute
   JournalIndexRoute: typeof JournalIndexRoute
   SkincareIndexRoute: typeof SkincareIndexRoute
   AdminJournalPostIdRoute: typeof AdminJournalPostIdRoute
@@ -415,13 +416,6 @@ declare module '@tanstack/react-router' {
       path: '/cart'
       fullPath: '/cart'
       preLoaderRoute: typeof CartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -473,12 +467,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiEchezonaWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout/': {
+      id: '/checkout/'
+      path: '/checkout'
+      fullPath: '/checkout/'
+      preLoaderRoute: typeof CheckoutIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkout/callback': {
       id: '/checkout/callback'
-      path: '/callback'
+      path: '/checkout/callback'
       fullPath: '/checkout/callback'
       preLoaderRoute: typeof CheckoutCallbackRouteImport
-      parentRoute: typeof CheckoutRoute
+      parentRoute: typeof rootRouteImport
     }
     '/journal/': {
       id: '/journal/'
@@ -595,32 +596,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface CheckoutRouteChildren {
-  CheckoutCallbackRoute: typeof CheckoutCallbackRoute
-}
-
-const CheckoutRouteChildren: CheckoutRouteChildren = {
-  CheckoutCallbackRoute: CheckoutCallbackRoute,
-}
-
-const CheckoutRouteWithChildren = CheckoutRoute._addFileChildren(
-  CheckoutRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   CartRoute: CartRoute,
-  CheckoutRoute: CheckoutRouteWithChildren,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   OasisRoute: OasisRoute,
   ReturnsRoute: ReturnsRoute,
   AdminLoginRoute: AdminLoginRoute,
   ApiEchezonaWebhookRoute: ApiEchezonaWebhookRoute,
+  CheckoutCallbackRoute: CheckoutCallbackRoute,
   JournalSlugRoute: JournalSlugRoute,
   SkincareProductIdRoute: SkincareProductIdRoute,
   AdminIndexRoute: AdminIndexRoute,
+  CheckoutIndexRoute: CheckoutIndexRoute,
   JournalIndexRoute: JournalIndexRoute,
   SkincareIndexRoute: SkincareIndexRoute,
   AdminJournalPostIdRoute: AdminJournalPostIdRoute,
